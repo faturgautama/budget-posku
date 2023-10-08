@@ -1,0 +1,394 @@
+<app-layout>
+    <div class="flex w-full h-full gap-5">
+        <div class="flex flex-col w-8/12 gap-3">
+            <!-- Header -->
+            <div class="flex justify-between p-3 rounded-md bg-white">
+                <div class="flex flex-col gap-0">
+                    <p class="text-blue-500 text-lg font-semibold">
+                        POS Kasir
+                    </p>
+                    <p class="text-gray-600 text-xs">
+                        Point of sales kasir toko Anda
+                    </p>
+                </div>
+
+                <div class="flex w-6/12">
+                    <span class="p-input-icon-right w-full">
+                        <i class="pi pi-search"></i>
+                        <input #Search id="scanBarcode" type="text" pInputText class="p-inputtext-sm w-full"
+                            placeholder="Scan Barcode Disini" (keyup.enter)="handleSearchProduk(Search.value)">
+                    </span>
+                </div>
+
+                <div class="flex">
+                    <p-button styleClass="p-button-sm p-button-secondary" label="Riwayat" icon="pi pi-book"></p-button>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="grid grid-cols-3 gap-3">
+                <app-card-produk *ngFor="let item of Barang$ | async" [props]="item!"
+                    (onClick)="handleClickProduk($event)">
+                </app-card-produk>
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-2 justify-between rounded-md p-3 bg-white w-4/12">
+            <div class="flex flex-col w-full">
+                <p class="text-gray-800 text-base font-semibold mb-0">
+                    Order Saat Ini
+                </p>
+
+                <p class="text-gray-600 text-xs mb-3 pb-3 border-b border-gray-200 border-dashed border-t-0 border-x-0">
+                    Order saat ini {{ Form.get('jumlah_item')?.value }} produk
+                </p>
+
+                <div class="flex gap-4 flex-col w-full h-80 p-1 overflow-x-auto">
+                    <div *ngFor="let item of Order; let i = index"
+                        class="flex flex-row justify-between items-center gap-3">
+                        <div class="flex gap-3">
+                            <p-avatar [label]="item.nama_barang[0] | uppercase"></p-avatar>
+
+                            <div class="flex flex-col">
+                                <p class="text-gray-800 text-sm font-semibold mb-1">
+                                    {{ item.nama_barang }}
+                                </p>
+                                <p class="text-orange-600 text-sm">
+                                    {{ (item.harga_jual * item.qty) | currency: 'Rp. ' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-3 items-center">
+                            <div class="flex items-center gap-3">
+                                <span class="px-2 py-0 bg-orange-100 rounded-md cursor-pointer"
+                                    (click)="handleEditQtyOrder('plus', i)">
+                                    <i class="pi pi-plus text-orange-600"
+                                        style="font-size: 8px !important; padding-bottom: 8px"></i>
+                                </span>
+
+                                <span class="w-14">
+                                    <p-inputNumber [(ngModel)]="item.qty"
+                                        styleClass="w-full p-inputtext-sm text-center qtyOrder">
+                                    </p-inputNumber>
+                                </span>
+
+                                <span class="px-2 py-0 bg-orange-100 rounded-md cursor-pointer"
+                                    (click)="handleEditQtyOrder('minus', i)">
+                                    <i class="pi pi-minus text-orange-600"
+                                        style="font-size: 8px !important; padding-bottom: 8px"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="flex flex-col bg-gray-50 px-5 py-3 rounded-md pt-2 mt-2 border-dashed border-gray-200 border-t border-b-0 border-x-0 h-30">
+                <div class="flex justify-between mb-2">
+                    <p class="text-gray-500 text-sm">
+                        Jumlah Item
+                    </p>
+
+                    <p class="text-gray-800 text-sm font-semibold">
+                        {{ Form.get('jumlah_item')?.value }}
+                    </p>
+                </div>
+
+                <div class="flex justify-between mb-5">
+                    <p class="text-gray-500 text-sm">
+                        Subtotal Order
+                    </p>
+
+                    <p class="text-gray-800 text-sm font-semibold">
+                        {{ Form.get('grand_total')?.value | currency: 'Rp. ' }}
+                    </p>
+                </div>
+
+                <div class="grid w-full">
+                    <p-button styleClass="p-button-info p-button-info p-button-sm w-full"
+                        label="[F5] Lanjutkan ke Pembayaran" (onClick)="handleOpenPaymentMethodDialog()">
+                    </p-button>
+                </div>
+            </div>
+        </div>
+
+        <p-dialog id="dialogPembayaran" #DialogPembayaran header="Pembayaran" [(visible)]="ToggleModalPembayaran"
+            [modal]="true" [style]="{ width: '80rem', height: '100vh' }" [draggable]="false" [resizable]="false"
+            [maximizable]="true" (onShow)="handleShowModalPembayaran($event)">
+
+            <div class="flex pt-1 gap-3 mb-3 pb-3 border-b border-dashed border-t-0 border-x-0 border-gray-300">
+                <p class="text-orange-600 text-sm font-semibold">
+                    HINTS
+                </p>
+                <p class="text-gray-600 text-sm">
+                    [F1] Kursor ke Metode Bayar
+                </p>
+                <p class="text-gray-600 text-sm">
+                    [F2] Kursor ke Bank
+                </p>
+                <p class="text-gray-600 text-sm">
+                    [F3] Kursor ke Diskon
+                </p>
+                <p class="text-gray-600 text-sm">
+                    [F4] Kursor ke Jumlah Pembayaran Diterima
+                </p>
+                <p class="text-gray-600 text-sm">
+                    [ESC] Kembali
+                </p>
+            </div>
+
+            <div class="flex gap-3 mb-1 pb-3 border-dashed border-gray-300 border-b border-t-0 border-x-0">
+                <div class="flex flex-col gap-2 w-6/12">
+                    <!-- Metode Bayar -->
+                    <div class="flex gap-2 w-full items-center">
+                        <div class="w-4/12">
+                            <p class="text-gray-600 text-sm">
+                                Metode Bayar
+                            </p>
+                        </div>
+                        <div class="w-8/12" [formGroup]="FormPaymentMethod">
+                            <p-dropdown #PaymentMethod [options]="PaymentMethod$" optionValue="id"
+                                optionLabel="metode_bayar" appendTo="body" [filter]="true"
+                                styleClass="p-inputtext-sm w-full" formControlName="id_metode_bayar">
+                            </p-dropdown>
+                        </div>
+                    </div>
+
+                    <!-- Bank -->
+                    <div class="flex gap-2 w-full items-center">
+                        <div class="w-4/12">
+                            <p class="text-gray-600 text-sm">
+                                Bank / EDC / Penyedia Jasa
+                            </p>
+                        </div>
+                        <div class="w-8/12" [formGroup]="FormPaymentMethod">
+                            <p-dropdown #Bank [options]="(Bank$ | async)!" optionValue="id" optionLabel="bank"
+                                [filter]="true" [autoDisplayFirst]="false" appendTo="body" [showClear]="true"
+                                styleClass="p-inputtext-sm w-full" formControlName="id_bank">
+                            </p-dropdown>
+                        </div>
+                    </div>
+
+                    <!-- Kurang Bayar -->
+                    <div class="flex gap-2 w-full items-center">
+                        <div class="w-4/12">
+                            <p class="text-gray-600 text-sm">
+                                Kurang Bayar
+                            </p>
+                        </div>
+                        <div class="w-8/12" [formGroup]="FormPaymentMethod">
+                            <p-inputNumber formControlName="total" styleClass="p-inputtext-sm w-full" [readonly]="true">
+                            </p-inputNumber>
+                        </div>
+                    </div>
+
+                    <!-- Diskon -->
+                    <div class="flex gap-2 w-full items-center">
+                        <div class="w-4/12">
+                            <p class="text-gray-600 text-sm">
+                                Diskon
+                            </p>
+                        </div>
+                        <div class="w-2/12" [formGroup]="FormPaymentMethod" style="margin-left: 5px">
+                            <p-inputNumber id="diskon_persen" formControlName="diskon_persen" [max]="100"
+                                styleClass="p-inputtext-sm w-full" (onBlur)="onCountDiskonPayment('diskon_persen')">
+                            </p-inputNumber>
+                        </div>
+                        <div class="w-6/12" [formGroup]="FormPaymentMethod">
+                            <p-inputNumber formControlName="diskon_rupiah" styleClass="p-inputtext-sm w-full"
+                                (onBlur)="onCountDiskonPayment('diskon_rupiah')">
+                            </p-inputNumber>
+                        </div>
+                    </div>
+
+                    <!-- Subtotal -->
+                    <div class="flex gap-2 w-full items-center">
+                        <div class="w-4/12">
+                            <p class="text-gray-600 text-sm">
+                                Total Payment
+                            </p>
+                        </div>
+                        <div class="w-8/12" [formGroup]="FormPaymentMethod">
+                            <p-inputNumber formControlName="total_payment_method" styleClass="p-inputtext-sm w-full"
+                                [readonly]="true">
+                            </p-inputNumber>
+                        </div>
+                    </div>
+
+                    <!-- Jumlah Pembayaran -->
+                    <div class="flex gap-2 w-full items-center">
+                        <div class="w-4/12">
+                            <p class="text-gray-600 text-sm">
+                                Jumlah Pembayaran Diterima
+                            </p>
+                        </div>
+                        <div class="w-5/12" [formGroup]="FormPaymentMethod" style="margin-left: 5px">
+                            <p-inputNumber id="jumlah_bayar" formControlName="jumlah_bayar"
+                                styleClass="p-inputtext-sm w-full"
+                                (onInput)="handleInputJumlahPembayaranDiterima($event)"
+                                (keydown.enter)="handleAddNewPaymentMethod(FormPaymentMethod.value)"
+                                [readonly]="FormPaymentMethod.get('total')?.value < 1"
+                                [placeholder]="FormPaymentMethod.get('total')?.value < 1 ? 'Transaksi sudah terbayar sepenuhnya' : ''">
+                            </p-inputNumber>
+                        </div>
+                        <div class="w-3/12">
+                            <p-button styleClass="p-button-info p-button-sm w-full" label="[Enter] Tambah"
+                                [disabled]="FormPaymentMethod.get('total')?.value < 1"
+                                (keydown.enter)="handleAddNewPaymentMethod(FormPaymentMethod.value)">
+                            </p-button>
+                        </div>
+                    </div>
+
+                    <!-- Kembalian -->
+                    <div class="flex gap-2 w-full items-center">
+                        <div class="w-4/12">
+                            <p class="text-gray-600 text-sm">
+                                Kembalian
+                            </p>
+                        </div>
+                        <div class="w-8/12" [formGroup]="FormPaymentMethod">
+                            <p-inputNumber formControlName="kembalian" styleClass="p-inputtext-sm w-full"
+                                [readonly]="true">
+                            </p-inputNumber>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="flex flex-col w-6/12 bg-gray-100 rounded-md p-3">
+                    <p class="text-gray-700 text-lg font-bold mb-3">
+                        Metode Pembayaran
+                    </p>
+
+                    <div class="flex gap-2 flex-col w-full">
+                        <div
+                            class="flex w-full gap-2 pb-1 mb-1 border-dashed border-gray-300 border-b border-t-0 border-x-0">
+                            <div class="flex w-3/12 mb-1">
+                                <p class="text-gray-600 text-sm font-semibold">
+                                    Metode Bayar
+                                </p>
+                            </div>
+                            <div class="flex w-4/12 mb-1">
+                                <p class="text-gray-600 text-sm font-semibold">
+                                    Jumlah Bayar
+                                </p>
+                            </div>
+                            <div class="flex w-3/12 mb-1">
+                                <p class="text-gray-600 text-sm font-semibold">
+                                    Kembali
+                                </p>
+                            </div>
+                            <div class="flex w-2/12 mb-1">
+                                <p class="text-gray-600 text-sm text-center font-semibold">
+                                    Aksi
+                                </p>
+                            </div>
+                        </div>
+                        <div *ngFor="let item of DataPaymentMethod; let i = index" class="flex w-full gap-2">
+                            <div class="flex w-3/12 mb-1">
+                                <p class="text-gray-600 text-sm">
+                                    {{ getPaymentMethod(item.id_metode_bayar) }}
+                                </p>
+                            </div>
+                            <div class="flex w-4/12 mb-1">
+                                <p class="text-gray-600 text-sm">
+                                    {{ item.jumlah_bayar | currency: 'Rp. ' }}
+                                </p>
+                            </div>
+                            <div class="flex w-3/12 mb-1">
+                                <p class="text-gray-600 text-sm">
+                                    {{ item.kembalian | currency: 'Rp. ' }}
+                                </p>
+                            </div>
+                            <div class="flex w-2/12 mb-1" (click)="handleDeletePaymentMethod(i)">
+                                <i class="pi pi-times"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-row w-full gap-5 mb-2 pt-2">
+                <div class="flex flex-col gap-2 w-6/12">
+                    <!-- Subtotal -->
+                    <div class="flex w-full gap-2 items-center">
+                        <div class="w-4/12">
+                            <p class="text-gray-600 text-sm">
+                                Total Transaksi
+                            </p>
+                        </div>
+                        <div class="w-3/12" [formGroup]="Form" style="margin-left: 5px">
+                            <p-inputNumber formControlName="jumlah_item" styleClass="p-inputtext-sm w-full"
+                                [readonly]="true" [suffix]="' Produk'">
+                            </p-inputNumber>
+                        </div>
+                        <div class="w-5/12" [formGroup]="Form">
+                            <p-inputNumber formControlName="grand_total" styleClass="p-inputtext-sm w-full"
+                                [readonly]="true" [prefix]="'Rp. '">
+                            </p-inputNumber>
+                        </div>
+                    </div>
+
+                    <!-- PPn -->
+                    <div class="flex gap-2 w-full items-center">
+                        <div class="w-4/12">
+                            <p class="text-gray-600 text-sm">
+                                PPn
+                            </p>
+                        </div>
+                        <div class="w-3/12" [formGroup]="Form" style="margin-left: 5px">
+                            <p-inputNumber id="ppn_persen" formControlName="ppn_persen" [max]="100"
+                                styleClass="p-inputtext-sm w-full" (onBlur)="onCountDiskonPayment('ppn_persen')">
+                            </p-inputNumber>
+                        </div>
+                        <div class="w-5/12" [formGroup]="Form">
+                            <p-inputNumber formControlName="ppn_rupiah" styleClass="p-inputtext-sm w-full"
+                                (onBlur)="onCountDiskonPayment('ppn_rupiah')">
+                            </p-inputNumber>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2 w-6/12">
+                    <!-- Biaya Lain -->
+                    <div class="flex gap-2 w-full items-center">
+                        <div class="w-4/12">
+                            <p class="text-gray-600 text-sm">
+                                Biaya Lain
+                            </p>
+                        </div>
+                        <div class="w-8/12" [formGroup]="Form">
+                            <p-inputNumber id="biaya_lain" formControlName="biaya_lain"
+                                styleClass="p-inputtext-sm w-full">
+                            </p-inputNumber>
+                        </div>
+                    </div>
+
+                    <!-- Grand Total -->
+                    <div class="flex gap-2 w-full items-center mb-2">
+                        <div class="w-4/12">
+                            <p class="text-gray-600 text-sm">
+                                Grand Total
+                            </p>
+                        </div>
+                        <div class="w-8/12" [formGroup]="Form">
+                            <p-inputNumber id="total_transaksi" formControlName="total_transaksi"
+                                styleClass="p-inputtext-sm w-full" [readonly]="true">
+                            </p-inputNumber>
+                        </div>
+                    </div>
+
+                    <!-- Button -->
+                    <div class="flex gap-2 w-full justify-end">
+                        <p-button styleClass="p-button-sm p-button-secondary" label="[ESC] Kembali"
+                            (onClick)="ToggleModalPembayaran = false">
+                        </p-button>
+                        <p-button styleClass="p-button-sm p-button-info" label="[F7] Simpan">
+                        </p-button>
+                    </div>
+                </div>
+            </div>
+        </p-dialog>
+    </div>
+</app-layout>

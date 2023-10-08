@@ -1,0 +1,64 @@
+<app-layout>
+    <!-- Table -->
+    <div *ngIf="FormState == 'list'" class="flex flex-col w-full gap-3">
+        <div class="flex justify-between items-center bg-white rounded-md p-3 w-full">
+            <div class="flex flex-col gap-0">
+                <p class="text-blue-500 text-lg font-semibold">
+                    Setup Bank
+                </p>
+                <p class="text-gray-600 text-xs">
+                    Setup bank Anda disini
+                </p>
+            </div>
+
+            <div class="flex gap-1">
+                <p-button styleClass="p-button-sm p-button-secondary" label="Tambah" icon="pi pi-plus"
+                    (onClick)="onClickButtonAdd()">
+                </p-button>
+
+                <p-menu #menu [model]="items" [popup]="true"></p-menu>
+                <p-button styleClass="p-button-sm p-button-info" label="Export" (onClick)="menu.toggle($event)"
+                    icon="pi pi-file">
+                </p-button>
+            </div>
+        </div>
+
+        <div class="grid">
+            <app-grid [props]="GridProps" (rowDoubleClicked)="onRowDoubleClicked($event)">
+            </app-grid>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div *ngIf="FormState != 'list'" class="flex flex-col gap-3">
+        <div class="flex justify-between items-center bg-white rounded-md p-3 w-full md:w-4/12">
+            <div class="flex flex-col gap-0">
+                <p class="text-blue-500 text-lg font-semibold">
+                    Setup Bank
+                </p>
+                <p class="text-gray-600 text-xs">
+                    Tambah / Update bank Anda disini
+                </p>
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-3 w-full md:w-4/12 bg-white rounded-md p-3" [formGroup]="Form">
+            <div class="flex flex-col w-full gap-1">
+                <p class="text-gray-600 text-sm">
+                    Bank
+                </p>
+                <input type="text" pInputText class="p-inputtext-sm w-full" formControlName="bank">
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <p-button styleClass="p-button-sm p-button-secondary" label="Kembali" icon="pi pi-chevron-left"
+                    (onClick)="FormState = 'list'">
+                </p-button>
+
+                <p-button styleClass="p-button-sm p-button-info" [label]="FormState == 'new' ? 'Simpan' : 'Update'"
+                    icon="pi pi-save" (onClick)="FormState == 'new' ? handleSave() : handleUpdate()">
+                </p-button>
+            </div>
+        </div>
+    </div>
+</app-layout>

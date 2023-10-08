@@ -1,0 +1,38 @@
+<section id="layout" class="w-screen h-screen overflow-hidden flex flex-col bg-gray-100">
+    <div class="flex w-full justify-between p-3 items-center">
+        <p class="text-blue-500 text-lg font-semibold">
+            BUDGET POSKU
+            <i class="pi pi-bars text-gray-500 ml-4" style="font-size: 13px"></i>
+        </p>
+
+        <div class="flex items-center gap-2 mr-5">
+            <p-avatar label="{{ UserData?.full_name[0] | uppercase }}" styleClass="mr-2" shape="circle"></p-avatar>
+
+            <p class="text-gray-600 text-sm">
+                {{ UserData?.full_name }}
+            </p>
+
+            <i class="pi pi-sign-out text-gray-500 ml-5" style="font-size: 13px" (click)="handleSignOut()"></i>
+        </div>
+    </div>
+
+    <div class="flex w-full h-full gap-3 px-3 pt-2 pb-3">
+        <!-- Sidebar -->
+        <div id="sidebar" class="w-16 transition-all flex flex-col items-start p-4 bg-white rounded-md"
+            (mouseenter)="handleHover('enter')" (mouseleave)="handleHover('leave')">
+            <div *ngFor="let item of Menu" class="flex justify-center items-center divMenus w-full mb-5 cursor-pointer"
+                (click)="handleNavigate(item.path)">
+                <i class="{{ item.icon }} text-gray-600" style="font-size: 12px"></i>
+                <p class="text-gray-700 text-sm ml-2 menus onlyIcon">
+                    {{ item.title }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="w-full p-3">
+            <ng-content></ng-content>
+        </div>
+    </div>
+
+</section>

@@ -1,0 +1,54 @@
+<app-layout>
+    <div class="flex md:flex-row flex-col w-full gap-3">
+        <div class="flex flex-col p-3 rounded-md bg-white w-full md:w-4/12">
+            <p class="text-gray-800 text-lg">
+                Selamat datang di <span class="text-blue-600">
+                    BUDGET POSKU
+                </span>
+            </p>
+            <p class="text-gray-700 text-sm mb-2 pb-2 border-b border-dashed border-gray-200 border-t-0 border-x-0">
+                {{ UserData.full_name }}
+            </p>
+
+            <p class="text-gray-600 text-sm mb-2">
+                Lokasi Anda
+            </p>
+
+            <p class="text-blue-600 text-sm">
+                {{ (Lokasi$ | async)?.nama_lokasi }}
+            </p>
+            <p class="text-gray-600 text-xs">
+                {{ (Lokasi$ | async)?.alamat }}
+            </p>
+            <p class="text-gray-600 text-xs mb-3">
+                {{ (Lokasi$ | async)?.no_handphone }}
+            </p>
+
+            <p-button styleClass="p-button-sm p-button-info" icon="pi pi-file-export" label="Unduh Database"
+                (onClick)="exportDatabase()">
+            </p-button>
+        </div>
+
+        <div class="flex flex-col p-3 rounded-md bg-white w-full md:w-8/12">
+            <p class="text-gray-700 text-base mb-1">
+                Import Database
+            </p>
+
+            <p class="text-gray-600 text-xs mb-3 pb-3 border-b border-dashed border-gray-200 border-t-0 border-x-0">
+                Import database dari file backup Anda
+            </p>
+
+            <p-fileUpload name="demo[]" (onUpload)="importDatabase($event)"
+                url="https://www.primefaces.org/cdn/api/upload.php" [multiple]="true" accept="application/json"
+                [maxFileSize]="1000000" [uploadStyleClass]="'p-button-sm p-button-info'" [uploadLabel]="'Import'"
+                [cancelStyleClass]="'p-button-sm p-button-info'" [chooseStyleClass]="'p-button-sm p-button-info'">
+                <ng-template pTemplate="content">
+                    <ul *ngIf="DbFiles.length">
+                        <li *ngFor="let file of DbFiles" class="text-xs">{{ file.name }}</li>
+                    </ul>
+                </ng-template>
+            </p-fileUpload>
+        </div>
+    </div>
+
+</app-layout>

@@ -1,0 +1,35 @@
+<section class="w-screen h-screen flex items-center justify-center bg-gray-100">
+    <div class="flex flex-col w-10/12 md:w-4/12 bg-white p-3 rounded-md shadow-sm" [formGroup]="Form">
+        <p class="text-blue-500 font-semibold text-2xl text-center">
+            BUDGET POSKU
+        </p>
+
+        <p class="text-gray-700 text-center text-sm mb-5">
+            Sign In ke Akun Anda
+        </p>
+
+        <!-- Email -->
+        <div class="flex flex-col gap-1 w-full mb-4">
+            <p class="text-gray-600 text-sm">
+                Email
+            </p>
+            <input type="text" pInputText class="p-inputtext-sm w-full" placeholder="Input email anda disini"
+                formControlName="email">
+        </div>
+
+        <!-- Password -->
+        <div class="flex flex-col gap-1 w-full mb-5">
+            <p class="text-gray-600 text-sm">
+                Password
+            </p>
+            <p-password styleClass="p-inputtext-sm w-full" [feedback]="false" [toggleMask]="true"
+                placeholder="Input password anda disini" formControlName="password" (keyup.enter)="onSignIn()">
+            </p-password>
+        </div>
+
+        <!-- Button -->
+        <div class="flex flex-col gap-1 w-full">
+            <p-button styleClass="p-button-sm p-button-info w-full" label="Sign In" (onClick)="onSignIn()"></p-button>
+        </div>
+    </div>
+</section>

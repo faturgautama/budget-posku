@@ -1,0 +1,16 @@
+<div *ngIf="props.toolbar?.length" class="flex bg-gray-100 w-full gap-5 px-3 py-3"
+    style="border-top-right-radius: 10px; border-top-left-radius: 10px; border: 1px solid #e5e7eb">
+    <span *ngFor="let item of gridToolbar" class="text-sm cursor-pointer" (click)="onToolbarClicked(item)">
+        <i [class]="item.icon" style="font-size: 13px"></i> {{ item.title }}
+    </span>
+</div>
+<div class="grid">
+    <ag-grid-angular [style.width]="'100%'" [style.height]="props.height"
+        class="ag-theme-alpine {{ props.toolbar?.length ? 'with_toolbar' : 'no_toolbar'}}" [columnDefs]="props.column"
+        [masterDetail]="props.masterDetail ? props.masterDetail : false"
+        [detailCellRendererParams]="props.detailCellRendererParams" [headerHeight]="40" [defaultColDef]="defaultColDef"
+        [rowData]="props.dataSource" [rowSelection]="'single'" [animateRows]="true" [pagination]="props.showPaging"
+        [paginationPageSize]="20" (gridReady)="onGridReady($event)" (cellClicked)="onCellClicked($event)"
+        (rowDoubleClicked)="onRowDoubleClicked($event)">
+    </ag-grid-angular>
+</div>
