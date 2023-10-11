@@ -34,6 +34,19 @@ const routes: Routes = [
         path: 'pos-kasir',
         loadComponent: async () => (await import('./feature/pos-kasir/pos-kasir.component')).PosKasirComponent
     },
+    {
+        path: 'penjualan',
+        children: [
+            {
+                path: 'riwayat',
+                loadComponent: async () => (await import('./feature/penjualan/penjualan.component')).PenjualanComponent
+            },
+            {
+                path: 'print-out/:id',
+                loadComponent: async () => (await import('./components/print-out-struk/print-out-struk.component')).PrintOutStrukComponent
+            },
+        ]
+    },
 ];
 
 @NgModule({

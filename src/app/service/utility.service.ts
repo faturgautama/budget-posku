@@ -42,6 +42,8 @@ export class UtilityService {
         try {
             const lokasi = await this._lokasiService.getAll();
 
+            console.log("LOKASI =>", db.counter.toArray());
+
             const blob = await exportDB(db, { prettyJson: true });
 
             if (lokasi[0]) {

@@ -11,15 +11,15 @@ export class AppComponent implements OnInit {
 
     lokasi$ = liveQuery(() => db.lokasi.toArray());
 
-    bank$ = liveQuery(() => db.bank.toArray());
+    // counter$ = liveQuery(() => db.counter.toArray());
 
     ngOnInit(): void {
         this.lokasi$.subscribe((result) => {
-            console.log(result[0]);
+            console.log("Lokasi =>", result[0]);
         });
 
-        // this.bank$.subscribe((result) => {
-        //     console.log(result);
+        // this.counter$.subscribe((result) => {
+        //     console.log("Counter =>", result);
         // });
     }
 }

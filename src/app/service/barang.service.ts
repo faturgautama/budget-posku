@@ -20,7 +20,7 @@ export class BarangService {
 
                         const payload = {
                             ...item,
-                            nama_satuan: nama_satuan
+                            nama_satuan: nama_satuan,
                         };
 
                         return payload;

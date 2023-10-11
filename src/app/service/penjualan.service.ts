@@ -33,7 +33,8 @@ export class PenjualanService {
             if (result.length) {
                 const data = {
                     ...result[0],
-                    detail: await this.getDetailPenjualan(id_penjualan)
+                    detail: await this.getDetailPenjualan(id_penjualan),
+                    detail_payment: await this.getDetailPayment(id_penjualan)
                 }
 
                 return [true, data]
@@ -80,14 +81,18 @@ export class PenjualanService {
         }
     }
 
-    async insert(data: any): Promise<[boolean, string]> {
+    async insert(data: any): Promise<[boolean, any]> {
         try {
             const result = await db.penjualan.add({
                 tanggal_penjualan: data.tanggal_penjualan,
-                no_faktur: data.no_faktur ? data.no_faktur : '',
+                no_faktur: data.no_faktur,
                 nama_customer: data.nama_customer ? data.nama_customer : '',
                 jumlah_item: data.jumlah_item,
                 grand_total: data.grand_total,
+                ppn_persen: data.ppn_persen,
+                ppn_rupiah: data.ppn_rupiah,
+                biaya_lain: data.biaya_lain,
+                total_transaksi: data.total_transaksi,
                 keterangan: data.keterangan ? data.keterangan : "",
             });
 
@@ -113,7 +118,16 @@ export class PenjualanService {
                     const resultDetailPayment = await db.penjualanDetailPayment.bulkAdd(detailPayment);
 
                     if (resultDetailPayment) {
-                        return [true, "Data Berhasil Disimpan"];
+
+                        const updateCounter = await this.updateCounter();
+
+                        if (updateCounter) {
+                            return [true, result];
+                        } else {
+                            return [false, "Gagal Update Counter"];
+                        }
+
+
                     } else {
                         return [false, "Data Payment Gagal Disimpan"];
                     }
@@ -154,6 +168,60 @@ export class PenjualanService {
 
         } catch (error) {
             throw error;
+        }
+    }
+
+    async generateNoFaktur(): Promise<string> {
+        const counter = await db.counter.where({
+            prefix: 'PJ'
+        }).toArray();
+
+        let no_faktur = ''
+
+        if (counter.length) {
+            let counting = "";
+
+            if (counter[0].counter < 10) {
+                counting = `000${counter[0].counter + 1}`
+            } else if (counter[0].counter < 100) {
+                counting = `00${counter[0].counter + 1}`
+            } else if (counter[0].counter < 1000) {
+                counting = `0${counter[0].counter + 1}`
+            } else {
+                counting = `${counter[0].counter + 1}`
+            }
+
+            no_faktur = `PJ-${counting}`;
+        } else {
+            const counter = await db.counter.add({
+                counter: 0,
+                prefix: 'PJ'
+            });
+
+            if (counter) {
+                no_faktur = `PJ-0001`;
+            }
+        }
+
+        return no_faktur;
+    }
+
+    async updateCounter(): Promise<any> {
+        const counter = await db.counter.where({
+            prefix: 'PJ'
+        }).toArray();
+
+        if (counter.length) {
+            const result = await db.counter.put({
+                id: counter[0].id,
+                prefix: counter[0].prefix,
+                counter: counter[0].counter + 1,
+            })
+
+            return result ? true : false;
+
+        } else {
+            return false;
         }
     }
 }

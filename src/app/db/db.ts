@@ -10,6 +10,7 @@ export class AppDB extends Dexie {
     penjualan!: Table<DbModel.Penjualan, number>;
     penjualanDetail!: Table<DbModel.PenjualanDetail, number>;
     penjualanDetailPayment!: Table<DbModel.PenjualanDetailPayment, number>;
+    counter!: Table<DbModel.Counter, number>;
 
     constructor() {
         super('ngdexielivequery');
@@ -22,16 +23,19 @@ export class AppDB extends Dexie {
             penjualan: '++id',
             penjualanDetail: '++id, id_penjualan, id_barang',
             penjualanDetailPayment: '++id, id_penjualan',
+            counter: '++id, prefix',
         });
 
         this.on('populate', () => this.populate());
     }
 
     async populate() {
-        // await db.lokasi.add({
-        //     nama_lokasi: 'SUPER FROZEN FOOD',
-        //     alamat: 'JALAN MANGUNHARJO RAYA 1',
-        // })
+        // await db.counter.add({
+        //     prefix: 'PJ',
+        //     counter: 0,
+        // });
+
+        // console.log(db.counter.toArray());
     }
 }
 

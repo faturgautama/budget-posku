@@ -70,4 +70,10 @@ export namespace DbModel {
         jumlah_bayar: number;
         kembalian: number;
     }
+
+    export interface Counter {
+        id?: number;
+        prefix: string;
+        counter: number;
+    }
 }

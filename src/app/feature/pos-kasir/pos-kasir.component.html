@@ -21,7 +21,9 @@
                 </div>
 
                 <div class="flex">
-                    <p-button styleClass="p-button-sm p-button-secondary" label="Riwayat" icon="pi pi-book"></p-button>
+                    <p-button styleClass="p-button-sm p-button-secondary" label="Riwayat" icon="pi pi-book"
+                        (onClick)="onNavigateToRiwayat()">
+                    </p-button>
                 </div>
             </div>
 
@@ -69,6 +71,7 @@
 
                                 <span class="w-14">
                                     <p-inputNumber [(ngModel)]="item.qty"
+                                        (ngModelChange)="handleChangeQtyOrder($event, i)"
                                         styleClass="w-full p-inputtext-sm text-center qtyOrder">
                                     </p-inputNumber>
                                 </span>
@@ -139,7 +142,79 @@
                 </p>
             </div>
 
-            <div class="flex gap-3 mb-1 pb-3 border-dashed border-gray-300 border-b border-t-0 border-x-0">
+            <div
+                class="flex flex-row w-full gap-5 mb-3 pb-2 border-dashed border-gray-300 border-b border-t-0 border-x-0">
+                <div class="flex flex-col gap-2 w-6/12">
+                    <!-- Subtotal -->
+                    <div class="flex w-full gap-2 items-center">
+                        <div class="w-4/12">
+                            <p class="text-gray-600 text-sm">
+                                Total Transaksi
+                            </p>
+                        </div>
+                        <div class="w-3/12" [formGroup]="Form" style="margin-left: 5px">
+                            <p-inputNumber formControlName="jumlah_item" styleClass="p-inputtext-sm w-full"
+                                [readonly]="true" [suffix]="' Produk'">
+                            </p-inputNumber>
+                        </div>
+                        <div class="w-5/12" [formGroup]="Form">
+                            <p-inputNumber formControlName="grand_total" styleClass="p-inputtext-sm w-full"
+                                [readonly]="true" [prefix]="'Rp. '">
+                            </p-inputNumber>
+                        </div>
+                    </div>
+
+                    <!-- PPn -->
+                    <div class="flex gap-2 w-full items-center">
+                        <div class="w-4/12">
+                            <p class="text-gray-600 text-sm">
+                                PPn
+                            </p>
+                        </div>
+                        <div class="w-3/12" [formGroup]="Form" style="margin-left: 5px">
+                            <p-inputNumber id="ppn_persen" formControlName="ppn_persen" [max]="100"
+                                styleClass="p-inputtext-sm w-full" (onBlur)="onCountPPnPayment('ppn_persen')">
+                            </p-inputNumber>
+                        </div>
+                        <div class="w-5/12" [formGroup]="Form">
+                            <p-inputNumber formControlName="ppn_rupiah" styleClass="p-inputtext-sm w-full"
+                                (onBlur)="onCountPPnPayment('ppn_rupiah')">
+                            </p-inputNumber>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2 w-6/12">
+                    <!-- Biaya Lain -->
+                    <div class="flex gap-2 w-full items-center">
+                        <div class="w-4/12">
+                            <p class="text-gray-600 text-sm">
+                                Biaya Lain
+                            </p>
+                        </div>
+                        <div class="w-8/12" [formGroup]="Form">
+                            <p-inputNumber id="biaya_lain" formControlName="biaya_lain"
+                                styleClass="p-inputtext-sm w-full" (onInput)="handleCountGrandTotalTransaksi($event)">
+                            </p-inputNumber>
+                        </div>
+                    </div>
+
+                    <!-- Grand Total -->
+                    <div class="flex gap-2 w-full items-center mb-2">
+                        <div class="w-4/12">
+                            <p class="text-gray-600 text-sm">
+                                Grand Total
+                            </p>
+                        </div>
+                        <div class="w-8/12" [formGroup]="Form">
+                            <p-inputNumber id="total_transaksi" formControlName="total_transaksi"
+                                styleClass="p-inputtext-sm w-full" [readonly]="true">
+                            </p-inputNumber>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-3 mb-3 ">
                 <div class="flex flex-col gap-2 w-6/12">
                     <!-- Metode Bayar -->
                     <div class="flex gap-2 w-full items-center">
@@ -310,84 +385,14 @@
                 </div>
             </div>
 
-            <div class="flex flex-row w-full gap-5 mb-2 pt-2">
-                <div class="flex flex-col gap-2 w-6/12">
-                    <!-- Subtotal -->
-                    <div class="flex w-full gap-2 items-center">
-                        <div class="w-4/12">
-                            <p class="text-gray-600 text-sm">
-                                Total Transaksi
-                            </p>
-                        </div>
-                        <div class="w-3/12" [formGroup]="Form" style="margin-left: 5px">
-                            <p-inputNumber formControlName="jumlah_item" styleClass="p-inputtext-sm w-full"
-                                [readonly]="true" [suffix]="' Produk'">
-                            </p-inputNumber>
-                        </div>
-                        <div class="w-5/12" [formGroup]="Form">
-                            <p-inputNumber formControlName="grand_total" styleClass="p-inputtext-sm w-full"
-                                [readonly]="true" [prefix]="'Rp. '">
-                            </p-inputNumber>
-                        </div>
-                    </div>
-
-                    <!-- PPn -->
-                    <div class="flex gap-2 w-full items-center">
-                        <div class="w-4/12">
-                            <p class="text-gray-600 text-sm">
-                                PPn
-                            </p>
-                        </div>
-                        <div class="w-3/12" [formGroup]="Form" style="margin-left: 5px">
-                            <p-inputNumber id="ppn_persen" formControlName="ppn_persen" [max]="100"
-                                styleClass="p-inputtext-sm w-full" (onBlur)="onCountDiskonPayment('ppn_persen')">
-                            </p-inputNumber>
-                        </div>
-                        <div class="w-5/12" [formGroup]="Form">
-                            <p-inputNumber formControlName="ppn_rupiah" styleClass="p-inputtext-sm w-full"
-                                (onBlur)="onCountDiskonPayment('ppn_rupiah')">
-                            </p-inputNumber>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex flex-col gap-2 w-6/12">
-                    <!-- Biaya Lain -->
-                    <div class="flex gap-2 w-full items-center">
-                        <div class="w-4/12">
-                            <p class="text-gray-600 text-sm">
-                                Biaya Lain
-                            </p>
-                        </div>
-                        <div class="w-8/12" [formGroup]="Form">
-                            <p-inputNumber id="biaya_lain" formControlName="biaya_lain"
-                                styleClass="p-inputtext-sm w-full">
-                            </p-inputNumber>
-                        </div>
-                    </div>
-
-                    <!-- Grand Total -->
-                    <div class="flex gap-2 w-full items-center mb-2">
-                        <div class="w-4/12">
-                            <p class="text-gray-600 text-sm">
-                                Grand Total
-                            </p>
-                        </div>
-                        <div class="w-8/12" [formGroup]="Form">
-                            <p-inputNumber id="total_transaksi" formControlName="total_transaksi"
-                                styleClass="p-inputtext-sm w-full" [readonly]="true">
-                            </p-inputNumber>
-                        </div>
-                    </div>
-
-                    <!-- Button -->
-                    <div class="flex gap-2 w-full justify-end">
-                        <p-button styleClass="p-button-sm p-button-secondary" label="[ESC] Kembali"
-                            (onClick)="ToggleModalPembayaran = false">
-                        </p-button>
-                        <p-button styleClass="p-button-sm p-button-info" label="[F7] Simpan">
-                        </p-button>
-                    </div>
-                </div>
+            <!-- Button -->
+            <div class="flex gap-2 w-full justify-end">
+                <p-button styleClass="p-button-sm p-button-secondary" label="[ESC] Kembali"
+                    (onClick)="ToggleModalPembayaran = false">
+                </p-button>
+                <p-button styleClass="p-button-sm p-button-info" label="[F7] Simpan"
+                    (onClick)="onSaveTransaksiPenjualan()">
+                </p-button>
             </div>
         </p-dialog>
     </div>

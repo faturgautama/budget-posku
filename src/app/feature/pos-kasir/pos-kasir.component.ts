@@ -14,6 +14,9 @@ import { Dropdown, DropdownModule } from 'primeng/dropdown';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MetodeBayarService } from 'src/app/service/metode-bayar.service';
 import { BankService } from 'src/app/service/bank.service';
+import { PenjualanService } from 'src/app/service/penjualan.service';
+import { MessageService } from 'primeng/api';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-pos-kasir',
@@ -105,12 +108,22 @@ export class PosKasirComponent implements OnInit, AfterViewInit {
                 jumlah_bayar.focus();
             }
         };
+
+        if (args.key == 'F7') {
+            args.preventDefault();
+            if (this.ToggleModalPembayaran) {
+                this.onSaveTransaksiPenjualan();
+            }
+        };
     }
 
     constructor(
+        private _router: Router,
         private _formBuilder: FormBuilder,
         private _bankService: BankService,
         private _barangService: BarangService,
+        private _messageService: MessageService,
+        private _penjualanService: PenjualanService,
         private _metodeBayarService: MetodeBayarService,
 
     ) {
@@ -137,12 +150,19 @@ export class PosKasirComponent implements OnInit, AfterViewInit {
             jumlah_bayar: [0, [Validators.required]],
             kembalian: [0, [Validators.required]],
         });
+
+
     }
 
     ngOnInit(): void {
         if (localStorage.getItem("_BGPSORDER_")) {
             this.Order = JSON.parse(localStorage.getItem("_BGPSORDER_") as any);
             this.handleCountTotalOrder();
+        }
+
+        if (localStorage.getItem("_BGPSPAYMENTHEADER_")) {
+            console.log(JSON.parse(localStorage.getItem("_BGPSPAYMENTHEADER_") as any))
+            this.Form.setValue(JSON.parse(localStorage.getItem("_BGPSPAYMENTHEADER_") as any));
         }
 
         if (localStorage.getItem("_BGPSPAYMENT_")) {
@@ -152,6 +172,11 @@ export class PosKasirComponent implements OnInit, AfterViewInit {
         this.getAllBarang();
 
         this.getAllPaymentMethod();
+
+        this._penjualanService.generateNoFaktur().then((result) => {
+            console.log("NO FAKTUR =>", result);
+            this.Form.get('no_faktur')?.setValue(result);
+        })
     }
 
     ngAfterViewInit(): void {
@@ -209,12 +234,22 @@ export class PosKasirComponent implements OnInit, AfterViewInit {
     }
 
     handleClickProduk(args: DbModel.Barang): void {
-        const exist = this.Order.findIndex((item) => { return item.id == args.id });
+        const exist = this.Order.findIndex((item) => { return item.id_barang == args.id });
 
         if (exist > -1) {
             this.Order[exist].qty += 1;
         } else {
-            this.Order.push({ ...args, qty: 1 });
+            delete args.id;
+            this.Order.push({
+                id_barang: args.id,
+                nama_barang: args.nama_barang,
+                barcode: args.barcode,
+                harga_jual: args.harga_jual,
+                id_satuan: args.id_satuan,
+                jumlah_stok: args.jumlah_stok,
+                nama_satuan: args.nama_satuan,
+                qty: 1
+            });
         }
 
         this.handleCountTotalOrder();
@@ -236,7 +271,15 @@ export class PosKasirComponent implements OnInit, AfterViewInit {
 
         setTimeout(() => {
             this.handleCountTotalOrder();
-            this.handleStoreToLocalstorage();
+            this.onCountPPnPayment('ppn_persen');
+        }, 200);
+    }
+
+    handleChangeQtyOrder(args: any, index: number): void {
+        this.Order[index].qty = args;
+        setTimeout(() => {
+            this.handleCountTotalOrder();
+            this.onCountPPnPayment('ppn_persen');
         }, 200);
     }
 
@@ -250,22 +293,50 @@ export class PosKasirComponent implements OnInit, AfterViewInit {
 
         this.Form.get('jumlah_item')?.setValue(jumlah_item);
         this.Form.get('grand_total')?.setValue(grand_total);
+
+        this.handleCountGrandTotalTransaksi();
     }
 
-    // ** Payment Method Dialog method ===
+    onCountPPnPayment(controls: string): void {
+        const grand_total = this.Form.get('grand_total')?.value;
+        const value = this.Form.get(controls)?.value;
+
+        if (controls == 'ppn_persen') {
+            this.Form.get('ppn_rupiah')?.setValue(0);
+            this.Form.get('ppn_rupiah')?.setValue(grand_total * (value / 100));
+        } else {
+            this.Form.get('ppn_persen')?.setValue(0);
+            this.Form.get('ppn_persen')?.setValue(((value / grand_total) * 100));
+        }
+
+        const total_transaksi = grand_total + this.Form.get('ppn_rupiah')?.value + this.Form.get('biaya_lain')?.value;
+        this.Form.get('total_transaksi')?.setValue(total_transaksi);
+
+        this.onInitPaymentMethod();
+        this.handleStoreToLocalstorage();
+    }
+
+    handleCountGrandTotalTransaksi(args?: any): void {
+        const grand_total = this.Form.get('grand_total')?.value;
+        const total_transaksi = grand_total + this.Form.get('ppn_rupiah')?.value + (args ? args.value : this.Form.get('biaya_lain')?.value);
+        this.Form.get('total_transaksi')?.setValue(total_transaksi);
+    }
+
+    // ** Payment Method Dialog method & logic ===
     handleShowModalPembayaran(args: any): void {
         console.log(args);
     }
 
     handleOpenPaymentMethodDialog(): void {
         this.ToggleModalPembayaran = true;
+        this.handleCountGrandTotalTransaksi();
         this.onInitPaymentMethod();
 
         this.DialogPembayaran.maximize();
 
         setTimeout(() => {
-            const jumlah_bayar = document.getElementById('jumlah_bayar')?.getElementsByClassName('p-inputnumber')[0].getElementsByClassName('p-inputnumber-input')[0] as HTMLInputElement;
-            jumlah_bayar.focus();
+            const ppn_persen = document.getElementById('ppn_persen')?.getElementsByClassName('p-inputnumber')[0].getElementsByClassName('p-inputnumber-input')[0] as HTMLInputElement;
+            ppn_persen.focus();
         }, 1000);
     }
 
@@ -278,16 +349,14 @@ export class PosKasirComponent implements OnInit, AfterViewInit {
                 terbayar += item.jumlah_bayar
             });
 
-            kurang_bayar = (this.Form.get('grand_total')?.value - terbayar) < 0 ? 0 : this.Form.get('grand_total')?.value - terbayar;
+            kurang_bayar = (this.Form.get('total_transaksi')?.value - terbayar) < 0 ? 0 : this.Form.get('total_transaksi')?.value - terbayar;
             this.FormPaymentMethod.get('total')?.setValue(kurang_bayar);
             this.FormPaymentMethod.get('total_payment_method')?.setValue(kurang_bayar);
 
         } else {
-            this.FormPaymentMethod.get('total')?.setValue(this.Form.get('grand_total')?.value);
-            this.FormPaymentMethod.get('total_payment_method')?.setValue(this.Form.get('grand_total')?.value);
+            this.FormPaymentMethod.get('total')?.setValue(this.Form.get('total_transaksi')?.value);
+            this.FormPaymentMethod.get('total_payment_method')?.setValue(this.Form.get('total_transaksi')?.value);
         }
-
-        // console.log("CURRENT PAYMENT METHOD FORM =>", this.FormPaymentMethod.value);
     }
 
     onCountDiskonPayment(controls: string): void {
@@ -331,8 +400,6 @@ export class PosKasirComponent implements OnInit, AfterViewInit {
             this.DataPaymentMethod[exist].jumlah_bayar += data.jumlah_bayar;
             this.DataPaymentMethod[exist].kembalian += data.kembalian;
 
-            console.log(this.DataPaymentMethod);
-
         } else {
             this.DataPaymentMethod.push(data);
         }
@@ -342,6 +409,7 @@ export class PosKasirComponent implements OnInit, AfterViewInit {
         this.FormPaymentMethod.get('diskon_persen')?.setValue(0);
         this.FormPaymentMethod.get('diskon_rupiah')?.setValue(0);
         this.FormPaymentMethod.get('jumlah_bayar')?.setValue(0);
+        this.FormPaymentMethod.get('kembalian')?.setValue(0);
     }
 
     handleDeletePaymentMethod(index: number): void {
@@ -353,10 +421,50 @@ export class PosKasirComponent implements OnInit, AfterViewInit {
     private handleStoreToLocalstorage(): void {
         localStorage.setItem("_BGPSORDER_", JSON.stringify(this.Order));
         localStorage.setItem('_BGPSPAYMENT_', JSON.stringify(this.DataPaymentMethod));
+        localStorage.setItem('_BGPSPAYMENTHEADER_', JSON.stringify(this.Form.value));
     }
 
     private handleDeleteLocalstorage(): void {
         localStorage.removeItem("_BGPSORDER_")
         localStorage.removeItem("_BGPSPAYMENT_")
+        localStorage.removeItem("_BGPSPAYMENTHEADER_")
+    }
+
+    // ** Save Transaksi ===
+    onSaveTransaksiPenjualan(): void {
+        const payload = {
+            ...this.Form.value,
+            detail: this.Order,
+            detail_payment: this.DataPaymentMethod
+        };
+
+        this._penjualanService.insert(payload)
+            .then((result) => {
+                if (result[0]) {
+                    this._messageService.clear();
+                    this._messageService.add({ severity: 'success', summary: 'Success', detail: 'Penjualan Berhasil Disimpan' });
+
+                    this.Form.reset();
+                    this.FormPaymentMethod.reset();
+                    this.Order = [];
+                    this.DataPaymentMethod = [];
+                    this.handleDeleteLocalstorage();
+
+                    this.ToggleModalPembayaran = false;
+
+                    setTimeout(() => {
+                        window.open('localhost:4200/print-out/' + result[1]);
+                        window.location.reload();
+                    }, 1000);
+
+                } else {
+                    this._messageService.clear();
+                    this._messageService.add({ severity: 'warn', summary: 'Oops', detail: result[1] });
+                }
+            })
+    }
+
+    onNavigateToRiwayat(): void {
+        this._router.navigateByUrl('penjualan/riwayat')
     }
 }
