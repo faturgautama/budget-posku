@@ -56,7 +56,7 @@ export class LayoutComponent {
             icon: 'pi pi-desktop'
         },
         {
-            path: 'laporan-penjualan',
+            path: 'penjualan/laporan',
             title: 'Laporan Penjualan',
             icon: 'pi pi-file'
         },

@@ -38,7 +38,7 @@ const routes: Routes = [
         path: 'penjualan',
         children: [
             {
-                path: 'riwayat',
+                path: 'laporan',
                 loadComponent: async () => (await import('./feature/penjualan/penjualan.component')).PenjualanComponent
             },
             {

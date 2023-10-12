@@ -1,5 +1,5 @@
 <app-layout>
-    <div class="flex flex-col w-full gap-3">
+    <div *ngIf="!ToggleDetail" class="flex flex-col w-full gap-3">
         <div class="flex justify-between items-center bg-white rounded-md p-3 w-full">
             <div class="flex flex-col gap-0">
                 <p class="text-blue-500 text-lg font-semibold">
@@ -19,8 +19,111 @@
         </div>
 
         <div class="grid">
-            <app-grid [props]="GridProps">
+            <app-grid [props]="GridProps" (toolbarClicked)="handleToolbarClicked($event)"
+                (cellClicked)="handleCellClicked($event)" (rowDoubleClicked)="handleRowDoubleClicked($event)">
             </app-grid>
+        </div>
+    </div>
+
+    <div *ngIf="ToggleDetail" class="flex flex-col w-full gap-3">
+        <div class="flex justify-between items-center bg-white rounded-md p-3 w-full">
+            <div class="flex flex-col gap-0">
+                <p class="text-blue-500 text-lg font-semibold">
+                    Detail Penjualan
+                </p>
+                <p class="text-gray-600 text-xs">
+                    Detail penjualan produk Anda disini
+                </p>
+            </div>
+
+            <div class="flex gap-1">
+                <p-button styleClass="p-button-sm p-button-info" label="Back" (onClick)="ToggleDetail = false"
+                    icon="pi pi-chevron-left">
+                </p-button>
+
+                <p-button styleClass="p-button-sm p-button-secondary" label="Print" (onClick)="navigateToPrintOut()"
+                    icon="pi pi-print">
+                </p-button>
+            </div>
+        </div>
+
+        <div class="flex mb-2 w-full p-3 rounded-md bg-white">
+            <div class="flex flex-col w-4/12 gap-2">
+                <!-- No Faktur -->
+                <div class="flex items-center w-full">
+                    <div class="w-4/12">
+                        <p class="text-gray-600 text-sm">
+                            No. Faktur
+                        </p>
+                    </div>
+                    <div class="w-8/12">
+                        <p class="text-gray-600 text-sm">
+                            :&nbsp; {{ GridSelectedData?.no_faktur }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Tgl. Penjualan -->
+                <div class="flex items-center w-full">
+                    <div class="w-4/12">
+                        <p class="text-gray-600 text-sm">
+                            Tgl. Penjualan
+                        </p>
+                    </div>
+                    <div class="w-8/12">
+                        <p class="text-gray-600 text-sm">
+                            :&nbsp; {{ GridSelectedData?.tanggal_penjualan | date: 'dd MMMM yyyy HH:mm' }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col w-4/12 gap-2">
+                <!-- No Faktur -->
+                <div class="flex items-center w-full gap-2">
+                    <div class="w-4/12">
+                        <p class="text-gray-600 text-sm">
+                            Jumlah Item
+                        </p>
+                    </div>
+                    <div class="w-8/12">
+                        <p class="text-gray-600 text-sm">
+                            :&nbsp; {{ GridSelectedData?.jumlah_item }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Tgl. Penjualan -->
+                <div class="flex items-center w-full gap-2">
+                    <div class="w-4/12">
+                        <p class="text-gray-600 text-sm">
+                            Grand Total
+                        </p>
+                    </div>
+                    <div class="w-8/12">
+                        <p class="text-gray-600 text-sm">
+                            :&nbsp; {{ GridSelectedData?.grand_total | currency: 'Rp. ' }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-3 rounded-md bg-white">
+            <p-tabView styleClass="w-full">
+                <p-tabPanel header="Detail Produk">
+                    <div class="grid w-full">
+                        <app-grid [props]="GridDetailProps">
+                        </app-grid>
+                    </div>
+                </p-tabPanel>
+                <p-tabPanel header="Detail Payment">
+                    <div class="grid w-full">
+                        <app-grid [props]="GridDetailPaymentProps">
+                        </app-grid>
+                    </div>
+                </p-tabPanel>
+            </p-tabView>
         </div>
     </div>
 </app-layout>

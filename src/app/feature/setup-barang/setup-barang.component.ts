@@ -13,6 +13,7 @@ import { LayoutComponent } from 'src/app/components/layout/layout.component';
 import { BarangService } from 'src/app/service/barang.service';
 import { SatuanService } from 'src/app/service/satuan.service';
 import { ReplaySubject, from, map, of, takeUntil } from 'rxjs';
+import { DocumentService } from 'src/app/service/document.service';
 
 @Component({
     selector: 'app-setup-barang',
@@ -43,14 +44,57 @@ export class SetupBarangComponent implements OnInit, OnDestroy {
             label: 'Export Excel',
             icon: 'pi pi-file-excel',
             command: () => {
-                // this.update();
+                let column: any[] = [
+                    {
+                        header: 'ID BARANG',
+                        key: 'id',
+                        width: 20,
+                    },
+                    {
+                        header: 'NAMA BARANG',
+                        key: 'nama_barang',
+                        width: 20,
+                    },
+                    {
+                        header: 'BARCODE',
+                        key: 'barcode',
+                        width: 20,
+                    },
+                    {
+                        header: 'ID SATUAN',
+                        key: 'id_satuan',
+                        width: 20,
+                    },
+                    {
+                        header: 'NAMA SATUAN',
+                        key: 'nama_satuan',
+                        width: 20,
+                    },
+                    {
+                        header: 'JUMLAH STOK',
+                        key: 'jumlah_stok',
+                        width: 20,
+                    },
+                    {
+                        header: 'HARGA JUAL',
+                        key: 'harga_jual',
+                        width: 20,
+                    },
+                ]
+
+                this._documentService.exportToExcel('produk', column, this.GridProps.dataSource);
             }
         },
         {
-            label: 'Export Pdf',
-            icon: 'pi pi-file-pdf',
+            label: 'Export CSV',
+            icon: 'pi pi-file',
             command: () => {
-                // this.delete();
+                const payload = {
+                    worksheetName: 'Produk',
+                    dataSource: this.GridProps.dataSource,
+                };
+
+                this._documentService.exportToCsv(payload);
             }
         }
     ];
@@ -87,6 +131,7 @@ export class SetupBarangComponent implements OnInit, OnDestroy {
         private _barangService: BarangService,
         private _messageService: MessageService,
         private _utilityService: UtilityService,
+        private _documentService: DocumentService,
     ) {
         this.Form = this._formBuilder.group({
             id: [0, []],

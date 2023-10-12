@@ -9,6 +9,7 @@ import { MessageService } from 'primeng/api';
 import { MenuModule } from 'primeng/menu';
 import { UtilityService } from 'src/app/service/utility.service';
 import { GridComponent, GridModel } from 'src/app/components/grid/grid.component';
+import { DocumentService } from 'src/app/service/document.service';
 
 @Component({
     selector: 'app-setup-satuan',
@@ -37,14 +38,37 @@ export class SetupSatuanComponent implements OnInit {
             label: 'Export Excel',
             icon: 'pi pi-file-excel',
             command: () => {
-                // this.update();
+                let column: any[] = [
+                    {
+                        header: 'ID',
+                        key: 'id',
+                        width: 20,
+                    },
+                    {
+                        header: 'NAMA SATUAN',
+                        key: 'nama_satuan',
+                        width: 20,
+                    },
+                    {
+                        header: 'ISI',
+                        key: 'isi',
+                        width: 20,
+                    }
+                ]
+
+                this._documentService.exportToExcel('satuan', column, this.GridProps.dataSource);
             }
         },
         {
-            label: 'Export Pdf',
-            icon: 'pi pi-file-pdf',
+            label: 'Export CSV',
+            icon: 'pi pi-file',
             command: () => {
-                // this.delete();
+                const payload = {
+                    worksheetName: 'Satuan',
+                    dataSource: this.GridProps.dataSource,
+                };
+
+                this._documentService.exportToCsv(payload);
             }
         }
     ];
@@ -68,6 +92,7 @@ export class SetupSatuanComponent implements OnInit {
         private _satuanService: SatuanService,
         private _messageService: MessageService,
         private _utilityService: UtilityService,
+        private _documentService: DocumentService,
     ) {
         this.Form = this._formBuilder.group({
             id: [0, []],

@@ -9,6 +9,7 @@ import { LayoutComponent } from 'src/app/components/layout/layout.component';
 import { MessageService } from 'primeng/api';
 import { UtilityService } from 'src/app/service/utility.service';
 import { BankService } from 'src/app/service/bank.service';
+import { DocumentService } from 'src/app/service/document.service';
 
 @Component({
     selector: 'app-setup-bank',
@@ -37,14 +38,32 @@ export class SetupBankComponent implements OnInit {
             label: 'Export Excel',
             icon: 'pi pi-file-excel',
             command: () => {
-                // this.update();
+                let column: any[] = [
+                    {
+                        header: 'ID',
+                        key: 'id',
+                        width: 20,
+                    },
+                    {
+                        header: 'BANK',
+                        key: 'bank',
+                        width: 20,
+                    }
+                ]
+
+                this._documentService.exportToExcel('metodeBayar', column, this.GridProps.dataSource);
             }
         },
         {
-            label: 'Export Pdf',
-            icon: 'pi pi-file-pdf',
+            label: 'Export CSV',
+            icon: 'pi pi-file',
             command: () => {
-                // this.delete();
+                const payload = {
+                    worksheetName: 'Metode Bayar',
+                    dataSource: this.GridProps.dataSource,
+                };
+
+                this._documentService.exportToCsv(payload);
             }
         }
     ];
@@ -64,6 +83,7 @@ export class SetupBankComponent implements OnInit {
         private _bankService: BankService,
         private _messageService: MessageService,
         private _utilityService: UtilityService,
+        private _documentService: DocumentService,
     ) {
         this.Form = this._formBuilder.group({
             id: [0, []],

@@ -150,8 +150,6 @@ export class PosKasirComponent implements OnInit, AfterViewInit {
             jumlah_bayar: [0, [Validators.required]],
             kembalian: [0, [Validators.required]],
         });
-
-
     }
 
     ngOnInit(): void {
@@ -238,8 +236,8 @@ export class PosKasirComponent implements OnInit, AfterViewInit {
 
         if (exist > -1) {
             this.Order[exist].qty += 1;
+            this.Order[exist].total = this.Order[exist].qty * this.Order[exist].harga_jual;
         } else {
-            delete args.id;
             this.Order.push({
                 id_barang: args.id,
                 nama_barang: args.nama_barang,
@@ -248,7 +246,8 @@ export class PosKasirComponent implements OnInit, AfterViewInit {
                 id_satuan: args.id_satuan,
                 jumlah_stok: args.jumlah_stok,
                 nama_satuan: args.nama_satuan,
-                qty: 1
+                qty: 1,
+                total: args.harga_jual
             });
         }
 
@@ -259,9 +258,11 @@ export class PosKasirComponent implements OnInit, AfterViewInit {
     handleEditQtyOrder(action: 'plus' | 'minus', index: number): void {
         if (action == 'plus') {
             this.Order[index].qty = this.Order[index].qty += 1;
+            this.Order[index].total = this.Order[index].qty * this.Order[index].harga_jual;
         } else {
             if (this.Order[index].qty > 0) {
                 this.Order[index].qty = this.Order[index].qty -= 1;
+                this.Order[index].total = this.Order[index].qty * this.Order[index].harga_jual;
             };
 
             if (this.Order[index].qty < 1) {
@@ -277,6 +278,8 @@ export class PosKasirComponent implements OnInit, AfterViewInit {
 
     handleChangeQtyOrder(args: any, index: number): void {
         this.Order[index].qty = args;
+        this.Order[index].total = this.Order[index].qty * this.Order[index].harga_jual;
+
         setTimeout(() => {
             this.handleCountTotalOrder();
             this.onCountPPnPayment('ppn_persen');
@@ -452,9 +455,10 @@ export class PosKasirComponent implements OnInit, AfterViewInit {
 
                     this.ToggleModalPembayaran = false;
 
+                    this._messageService.clear();
+
                     setTimeout(() => {
-                        window.open('localhost:4200/print-out/' + result[1]);
-                        window.location.reload();
+                        this._router.navigate(['penjualan/print-out', result[1]]);
                     }, 1000);
 
                 } else {

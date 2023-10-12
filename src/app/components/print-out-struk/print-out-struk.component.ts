@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { LokasiService } from 'src/app/service/lokasi.service';
 import { PenjualanService } from 'src/app/service/penjualan.service';
 import { ActivatedRoute } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
     selector: 'app-print-out-struk',
@@ -13,6 +14,12 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class PrintOutStrukComponent implements AfterViewInit {
 
+    Lokasi: any;
+
+    Penjualan: any;
+
+    Loading = new BehaviorSubject(false);
+
     constructor(
         private _lokasiService: LokasiService,
         private _activatedRoute: ActivatedRoute,
@@ -20,17 +27,27 @@ export class PrintOutStrukComponent implements AfterViewInit {
     ) { }
 
     ngAfterViewInit(): void {
+        this.Loading.next(true);
+
         setTimeout(() => {
             this.getLokasi();
             this.getDetail();
-        }, 1000);
+        }, 250);
+
+        this.Loading.subscribe((result) => {
+            if (!result) {
+                setTimeout(() => {
+                    window.print();
+                }, 200);
+            }
+        })
     }
 
     getLokasi(): void {
         this._lokasiService.getAll()
             .then((result) => {
                 if (result[0]) {
-                    console.log("LOKASI =>", result[1])
+                    this.Lokasi = result[1];
                 }
             })
     }
@@ -38,10 +55,13 @@ export class PrintOutStrukComponent implements AfterViewInit {
     getDetail(): void {
         const id = this._activatedRoute.snapshot.params['id'];
 
-        this._penjualanService.getDetail(id).then((result) => {
-            if (result[0]) {
-                console.log("DETAIL =>", result[1]);
-            }
-        })
+        this._penjualanService.getDetail(id)
+            .then((result) => {
+                if (result[0]) {
+                    this.Penjualan = result[1];
+                }
+            }).finally(() => {
+                this.Loading.next(false)
+            })
     }
 }

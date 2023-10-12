@@ -1,7 +1,135 @@
-<section id="struk" class="flex justify-center bg-white w-screen h-auto">
-    <div class="w-6/12">
-        <p class="text-gray-800 font-semibold text-sm">
+<section *ngIf="Penjualan" id="struk"
+    class="flex flex-col items-center justify-center bg-white w-screen h-auto p-5 font-mono">
+    <div class="w-full mb-5">
+        <p class="text-gray-800 font-semibold text-base text-center">
+            {{ Lokasi?.nama_lokasi }}
+        </p>
+        <p class="text-gray-700 text-xs text-center">
+            {{ Lokasi?.alamat }}
+        </p>
+        <p class="text-gray-700 text-xs text-center">
+            {{ Lokasi?.no_handphone }}
+        </p>
+    </div>
 
+    <div *ngIf="Penjualan" class="w-full py-2 border-y border-dashed border-gray-500 border-x-0 mb-5">
+        <div class="flex w-full justify-between items-center mb-1">
+            <p class="text-gray-800 text-xs">
+                {{ Penjualan?.tanggal_penjualan | date: 'dd MMM yyyy' }}
+            </p>
+            <p class="text-gray-800 text-xs">
+                {{ Penjualan?.tanggal_penjualan | date: 'HH:mm' }}
+            </p>
+        </div>
+
+        <div class="flex w-full justify-between items-center">
+            <p class="text-gray-800 text-xs">
+                No. Faktur
+            </p>
+            <p class="text-gray-800 text-xs">
+                {{ Penjualan?.no_faktur }}
+            </p>
+        </div>
+
+    </div>
+
+    <div class="w-full mb-3 pb-3 border-b border-dashed border-gray-500 border-x-0 border-t-0">
+        <div *ngFor="let item of Penjualan?.detail[1]" class="flex flex-col w-full justify-between mb-2">
+            <p class="text-gray-800 text-xs font-semibold">
+                {{ item.nama_barang }}
+            </p>
+
+            <div class="flex w-full justify-between items-center">
+                <p class="text-gray-800 text-xs">
+                    {{ item.qty }} {{ item.nama_satuan }}
+                    <span class="ml-3">
+                        @{{ item.harga_jual | currency: 'Rp. ' }}
+                    </span>
+                </p>
+
+                <p class="text-gray-800 text-xs">
+                    {{ item.total | currency: 'Rp. ' }}
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="w-full mb-5">
+        <div class="flex w-full justify-between items-center mb-1">
+            <p class="text-gray-800 text-xs font-semibold">
+                Jumlah Item
+            </p>
+
+            <p class="text-gray-800 text-xs">
+                {{ Penjualan?.jumlah_item }}
+            </p>
+        </div>
+
+        <div class="flex w-full justify-between items-center mb-1">
+            <p class="text-gray-800 text-xs font-semibold">
+                Total
+            </p>
+
+            <p class="text-gray-800 text-xs">
+                {{ Penjualan?.grand_total | currency: 'Rp. ' }}
+            </p>
+        </div>
+
+        <div *ngIf="Penjualan?.ppn_persen > 0" class="flex w-full justify-between items-center mb-1">
+            <p class="text-gray-800 text-xs font-semibold">
+                PPn ({{ Penjualan?.ppn_persen }}%)
+            </p>
+
+            <p class="text-gray-800 text-xs">
+                {{ Penjualan?.ppn_rupiah | currency: 'Rp. ' }}
+            </p>
+        </div>
+
+        <div *ngIf="Penjualan?.biaya_lain > 0" class="flex w-full justify-between items-center mb-1">
+            <p class="text-gray-800 text-xs font-semibold">
+                Biaya Lain
+            </p>
+
+            <p class="text-gray-800 text-xs">
+                {{ Penjualan?.biaya_lain | currency: 'Rp. ' }}
+            </p>
+        </div>
+
+        <div class="flex w-full justify-between items-center mb-5">
+            <p class="text-gray-800 text-xs font-semibold">
+                Grand Total
+            </p>
+
+            <p class="text-gray-800 text-xs">
+                {{ Penjualan?.total_transaksi | currency: 'Rp. ' }}
+            </p>
+        </div>
+
+        <div *ngFor="let item of Penjualan?.detail_payment[1]" class="flex flex-col w-full mb-3">
+            <div class="flex w-full justify-between mb-1">
+                <p class="text-gray-800 text-xs">
+                    {{ item.metode_bayar }}
+                </p>
+                <p class="text-gray-800 text-xs">
+                    {{ item.jumlah_bayar | currency: 'Rp. ' }}
+                </p>
+            </div>
+            <div class="flex w-full justify-between mb-1">
+                <p class="text-gray-800 text-xs">
+                    Kembalian
+                </p>
+                <p class="text-gray-800 text-xs">
+                    {{ item.kembalian | currency: 'Rp. ' }}
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="w-full">
+        <p class="text-gray-800 font-semibold text-base text-center">
+            ** LUNAS **
         </p>
     </div>
 </section>

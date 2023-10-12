@@ -149,4 +149,33 @@ export class BarangService {
             throw error;
         }
     }
+
+    async updateStok(id_barang: number, qty: number): Promise<[boolean, string]> {
+        try {
+            const barang = await db.barang.get(id_barang);
+
+            if (barang) {
+                const result = await db.barang.put({
+                    id: barang?.id,
+                    id_satuan: barang.id_satuan,
+                    nama_barang: barang.nama_barang,
+                    barcode: barang.barcode,
+                    harga_jual: barang.harga_jual,
+                    jumlah_stok: barang?.jumlah_stok! - qty,
+                });
+
+                if (result) {
+                    return [true, "Data Berhasil Diperbarui"]
+                } else {
+                    return [false, "Data Gagal Diperbarui"];
+                }
+            } else {
+                return [false, "Data Gagal Diperbarui"];
+            }
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }

@@ -26,15 +26,13 @@ export class PenjualanService {
 
     async getDetail(id_penjualan: number): Promise<[boolean, DbModel.Penjualan]> {
         try {
-            const result: any[] = await db.penjualan.where({
-                id_penjualan: id_penjualan,
-            }).toArray();
+            const result: any = await db.penjualan.get(parseInt(id_penjualan as any));
 
-            if (result.length) {
+            if (result) {
                 const data = {
-                    ...result[0],
-                    detail: await this.getDetailPenjualan(id_penjualan),
-                    detail_payment: await this.getDetailPayment(id_penjualan)
+                    ...result,
+                    detail: await this.getDetailPenjualan(parseInt(id_penjualan as any)),
+                    detail_payment: await this.getDetailPayment(parseInt(id_penjualan as any))
                 }
 
                 return [true, data]
@@ -50,8 +48,8 @@ export class PenjualanService {
     async getDetailPenjualan(id_penjualan: number): Promise<[boolean, DbModel.PenjualanDetail[]]> {
         try {
             const result: any[] = await db.penjualanDetail.where({
-                id_penjualan: id_penjualan,
-            }).toArray();
+                id_penjualan: parseInt(id_penjualan as any),
+            }).toArray()
 
             if (result) {
                 return [true, result]
@@ -66,9 +64,26 @@ export class PenjualanService {
 
     async getDetailPayment(id_penjualan: number): Promise<[boolean, DbModel.PenjualanDetailPayment[]]> {
         try {
+            const payment_method = await db.metodeBayar.toArray();
+            const bank = await db.bank.toArray();
+
             const result: any[] = await db.penjualanDetailPayment
-                .where({ id_penjualan: id_penjualan })
-                .toArray();
+                .where({ id_penjualan: parseInt(id_penjualan as any) })
+                .toArray()
+                .then((payment) => {
+                    return payment.map((item) => {
+                        const metode_bayar = payment_method.find((pym) => { return pym.id == item.id_metode_bayar })?.metode_bayar;
+                        const nama_bank = bank.find((pym) => { return pym.id == item.id_bank })?.bank;
+
+                        const payload = {
+                            ...item,
+                            metode_bayar: metode_bayar,
+                            bank: nama_bank,
+                        };
+
+                        return payload;
+                    })
+                })
 
             if (result) {
                 return [true, result]
@@ -109,6 +124,8 @@ export class PenjualanService {
                 if (resultDetail) {
 
                     const detailPayment = data.detail_payment.map((item: any) => {
+                        console.log(item);
+
                         return {
                             id_penjualan: result,
                             ...item
