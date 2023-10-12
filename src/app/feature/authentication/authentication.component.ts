@@ -62,6 +62,10 @@ export class AuthenticationComponent implements OnInit {
         }
     }
 
+    onClickDemo(): void {
+        window.open('https://api.whatsapp.com/send/?phone=6285156781165&text=Halo%20Saya%20Mau%20User%20Demo%20Budget%20POSKU')
+    }
+
     private handlingAuth(data: any): void {
         localStorage.setItem('_BGPSUD_', JSON.stringify(data));
         this._router.navigateByUrl('beranda');
