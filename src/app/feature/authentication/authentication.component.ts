@@ -25,7 +25,42 @@ import { Router } from '@angular/router';
 })
 export class AuthenticationComponent implements OnInit {
 
-    Form: FormGroup
+    Form: FormGroup;
+
+    Features: any[] = [
+        {
+            id: 1,
+            title: 'Fitur Penjualan Yang Kasir-friendly',
+            description: 'Penjualan mudah dilakukan, dengan pintasan (shortcut) keyboard. Sehingga minim penggunaan mouse',
+            image: '../../../assets/1.png',
+        },
+        {
+            id: 2,
+            title: 'Multi Metode Bayar',
+            description: 'Upgrade metode bayar produk Anda. BUDGET POSku memiliki fitur multi payment method. ',
+            image: '../../../assets/2.png',
+        },
+        {
+            id: 3,
+            title: 'Tampilan Struk Penjualan',
+            description: 'Tersedia struk penjualan, hubungkan dengan printer Anda dan lakukan print dengan beberapa langkah saja.',
+            image: '../../../assets/3.png',
+        },
+        {
+            id: 4,
+            title: 'Ekspor Data ke Excel',
+            description: 'Ekspor data transaksi Anda ke excel, sehingga Anda dapat melakukan perincian dan perencanaan produk',
+            image: '../../../assets/4.png',
+        },
+        {
+            id: 5,
+            title: 'Dukungan Offline',
+            description: 'Provider internet Anda sedang bermasalah? Tidak masalah, karena BUDGET POSku dapat dijalankan secara offline',
+            image: '../../../assets/5.png',
+        },
+    ];
+
+    SelectedFeature: number = 0;
 
     constructor(
         private _router: Router,
@@ -37,10 +72,26 @@ export class AuthenticationComponent implements OnInit {
         this.Form = this._formBuilder.group({
             email: ['', [Validators.required]],
             password: ['', [Validators.required]]
-        })
+        });
     }
 
     ngOnInit(): void {
+    }
+
+    onNavigateFeature(type: 'next' | 'prev', index: number): void {
+        if (type == 'next') {
+            if (index < this.Features.length - 1) {
+                this.SelectedFeature += 1;
+            } else {
+                this.SelectedFeature = 0;
+            }
+        } else {
+            if (index > -1) {
+                this.SelectedFeature -= 1;
+            } else {
+                this.SelectedFeature = this.Features.length - 1
+            }
+        }
     }
 
     onSignIn(): void {
