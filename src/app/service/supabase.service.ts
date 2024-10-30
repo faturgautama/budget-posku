@@ -10,13 +10,14 @@ export class SupabaseService {
 
     private supabaseClient: SupabaseClient;
 
-    private supabaseUrl = 'https://wqduboyvvwtjjgtjkzbb.supabase.co';
+    // ** Email s*********er8@gmail.com
+    private supabaseUrl = 'https://bmleshdonhvvyfgrhxgi.supabase.co';
 
     constructor(
         private router: Router,
         private _messageService: MessageService,
     ) {
-        const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxZHVib3l2dnd0ampndGpremJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTYzMDUxMDgsImV4cCI6MjAxMTg4MTEwOH0.no9-hro89w1u74NU-ul6RGFsgROvRoY0hUhqw8lf1_E'
+        const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbGVzaGRvbmh2dnlmZ3JoeGdpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzAyNTMwMTIsImV4cCI6MjA0NTgyOTAxMn0.N-BgEfhK1Byzs_YShOOb3u48krnWXWqbMsZoIemsDKw'
         this.supabaseClient = createClient(this.supabaseUrl, key)
     }
 

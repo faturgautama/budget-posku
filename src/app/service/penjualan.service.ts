@@ -111,51 +111,43 @@ export class PenjualanService {
                 keterangan: data.keterangan ? data.keterangan : "",
             });
 
-            if (result > 0) {
-                const detail = data.detail.map((item: any) => {
-                    return {
-                        id_penjualan: result,
-                        ...item
-                    }
-                });
-
-                const resultDetail = await db.penjualanDetail.bulkAdd(detail);
-
-                if (resultDetail) {
-
-                    const detailPayment = data.detail_payment.map((item: any) => {
-                        console.log(item);
-
-                        return {
-                            id_penjualan: result,
-                            ...item
-                        }
-                    });
-
-                    const resultDetailPayment = await db.penjualanDetailPayment.bulkAdd(detailPayment);
-
-                    if (resultDetailPayment) {
-
-                        const updateCounter = await this.updateCounter();
-
-                        if (updateCounter) {
-                            return [true, result];
-                        } else {
-                            return [false, "Gagal Update Counter"];
-                        }
-
-
-                    } else {
-                        return [false, "Data Payment Gagal Disimpan"];
-                    }
-
-                } else {
-                    return [false, "Data Detail Gagal Disimpan"]
-                }
-
-            } else {
+            if (result < 1) {
                 return [false, "Data Gagal Disimpan"];
             }
+
+            const detail = data.detail.map((item: any) => {
+                return {
+                    id_penjualan: result,
+                    ...item
+                }
+            });
+
+            const resultDetail = await db.penjualanDetail.bulkAdd(detail);
+
+            if (!resultDetail) {
+                return [false, "Data Detail Gagal Disimpan"]
+            }
+
+            const detailPayment = data.detail_payment.map((item: any) => {
+                return {
+                    id_penjualan: result,
+                    ...item
+                }
+            });
+
+            const resultDetailPayment = await db.penjualanDetailPayment.bulkAdd(detailPayment);
+
+            if (!resultDetailPayment) {
+                return [false, "Data Payment Gagal Disimpan"];
+            }
+
+            const updateCounter = await this.updateCounter();
+
+            if (!updateCounter) {
+                return [false, "Gagal Update Counter"];
+            }
+
+            return [true, result];
 
         } catch (error) {
             throw error;
