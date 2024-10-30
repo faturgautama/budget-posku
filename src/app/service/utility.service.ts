@@ -13,6 +13,8 @@ import { formatDate } from '@angular/common';
 })
 export class UtilityService {
 
+    version: string = "0.1.0";
+
     constructor(
         private _lokasiService: LokasiService,
         private _messageService: MessageService
