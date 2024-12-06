@@ -10,6 +10,10 @@ export class AppDB extends Dexie {
     penjualan!: Table<DbModel.Penjualan, number>;
     penjualanDetail!: Table<DbModel.PenjualanDetail, number>;
     penjualanDetailPayment!: Table<DbModel.PenjualanDetailPayment, number>;
+    pembelian!: Table<DbModel.Pembelian, number>;
+    pembelianDetail!: Table<DbModel.PembelianDetail, number>;
+    kartuStok!: Table<DbModel.KartuStok, number>;
+    saldoBarang!: Table<DbModel.StokBarang, number>;
     counter!: Table<DbModel.Counter, number>;
 
     constructor() {
@@ -23,6 +27,10 @@ export class AppDB extends Dexie {
             penjualan: '++id',
             penjualanDetail: '++id, id_penjualan, id_barang',
             penjualanDetailPayment: '++id, id_penjualan',
+            pembelian: '++id',
+            pembelianDetail: '++id, id_pembelian, id_barang',
+            kartuStok: '++id, id_barang',
+            stokBarang: '++id, id_barang',
             counter: '++id, prefix',
         });
 

@@ -96,20 +96,22 @@ export class AuthenticationComponent implements OnInit {
 
     onSignIn(): void {
         if (this._utilityService.checkValidator(this.Form)) {
-            this._supabaseService.checkUser(this.Form.get('email')?.value, this.Form.get('password')?.value)
-                .then((result) => {
-                    this._messageService.clear();
+            // this._supabaseService.checkUser(this.Form.get('email')?.value, this.Form.get('password')?.value)
+            //     .then((result) => {
+            //         this._messageService.clear();
 
-                    if (result[0]) {
-                        this._messageService.add({ severity: 'success', summary: 'Success', detail: 'Sign In Berhasil' });
+            //         if (result[0]) {
+            //             this._messageService.add({ severity: 'success', summary: 'Success', detail: 'Sign In Berhasil' });
 
-                        setTimeout(() => {
-                            this.handlingAuth(result[1]);
-                        }, 1500);
-                    } else {
-                        this._messageService.add({ severity: 'error', summary: 'Oops', detail: result[1] })
-                    }
-                });
+            //             setTimeout(() => {
+            //                 this.handlingAuth(result[1]);
+            //             }, 1500);
+            //         } else {
+            //             this._messageService.add({ severity: 'error', summary: 'Oops', detail: result[1] })
+            //         }
+            //     });
+
+            this.handlingAuth(null);
         }
     }
 
@@ -118,7 +120,7 @@ export class AuthenticationComponent implements OnInit {
     }
 
     private handlingAuth(data: any): void {
-        localStorage.setItem('_BGPSUD_', JSON.stringify(data));
+        localStorage.setItem('_BGPSUD_', JSON.stringify({ full_name: 'Admin', email: 'admin@gmail.com' }));
         this._router.navigateByUrl('beranda');
     }
 }

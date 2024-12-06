@@ -9,42 +9,42 @@ const routes: Routes = [
     },
     {
         path: 'beranda',
-        canActivate: [AuthGuard],
+        // canActivate: [AuthGuard],
         loadComponent: async () => (await import('./feature/beranda/beranda.component')).BerandaComponent
     },
     {
         path: 'setup-lokasi',
-        canActivate: [AuthGuard],
+        // canActivate: [AuthGuard],
         loadComponent: async () => (await import('./feature/setup-lokasi/setup-lokasi.component')).SetupLokasiComponent
     },
     {
         path: 'setup-satuan',
-        canActivate: [AuthGuard],
+        // canActivate: [AuthGuard],
         loadComponent: async () => (await import('./feature/setup-satuan/setup-satuan.component')).SetupSatuanComponent
     },
     {
         path: 'setup-barang',
-        canActivate: [AuthGuard],
+        // canActivate: [AuthGuard],
         loadComponent: async () => (await import('./feature/setup-barang/setup-barang.component')).SetupBarangComponent
     },
     {
         path: 'setup-metode-bayar',
-        canActivate: [AuthGuard],
+        // canActivate: [AuthGuard],
         loadComponent: async () => (await import('./feature/setup-metode-bayar/setup-metode-bayar.component')).SetupMetodeBayarComponent
     },
     {
         path: 'setup-bank',
-        canActivate: [AuthGuard],
+        // canActivate: [AuthGuard],
         loadComponent: async () => (await import('./feature/setup-bank/setup-bank.component')).SetupBankComponent
     },
     {
         path: 'pos-kasir',
-        canActivate: [AuthGuard],
+        // canActivate: [AuthGuard],
         loadComponent: async () => (await import('./feature/pos-kasir/pos-kasir.component')).PosKasirComponent
     },
     {
         path: 'penjualan',
-        canActivate: [AuthGuard],
+        // canActivate: [AuthGuard],
         children: [
             {
                 path: 'laporan',

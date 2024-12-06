@@ -1,5 +1,4 @@
 export namespace DbModel {
-
     export interface Lokasi {
         id?: number;
         nama_lokasi: string;
@@ -21,6 +20,8 @@ export namespace DbModel {
         barcode: string;
         id_satuan: number;
         nama_satuan?: string;
+        brand?: string;
+        ukuran?: string;
         harga_jual: string;
         jumlah_stok?: number;
     }
@@ -33,6 +34,25 @@ export namespace DbModel {
     export interface Bank {
         id?: number;
         bank: string;
+    }
+
+    export interface Pembelian {
+        id?: number;
+        tanggal_pembelian: string;
+        no_faktur?: string;
+        nama_supplier?: string;
+        jumlah_item?: number;
+        grand_total: number;
+        keterangan?: string;
+    }
+
+    export interface PembelianDetail {
+        id?: number;
+        id_pembelian: number;
+        id_barang: number;
+        harga_beli: number;
+        qty: string;
+        total: number;
     }
 
     export interface Penjualan {
@@ -69,6 +89,24 @@ export namespace DbModel {
         total_payment_method: number;
         jumlah_bayar: number;
         kembalian: number;
+    }
+
+    export interface KartuStok {
+        id?: number;
+        ref_id?: number;
+        id_barang: number;
+        saldo_awal?: number;
+        nilai_masuk?: number;
+        nilai_keluar?: number;
+        saldo_akhir?: number;
+        keterangan?: string;
+        created_at: string;
+    }
+
+    export interface StokBarang {
+        id?: number;
+        id_barang: number;
+        sisa_stok: number;
     }
 
     export interface Counter {
