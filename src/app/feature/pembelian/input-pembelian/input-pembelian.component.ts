@@ -114,10 +114,14 @@ export class InputPembelianComponent implements OnInit {
     handleCountTotalDetail(args: any) {
         const qty = this.FormDetail.get('qty')?.value, harga_beli = this.FormDetail.get('harga_beli')?.value;
         let total = qty * harga_beli;
-        console.log("total =>", total);
+        setTimeout(() => {
+            this.FormDetail.get('total')?.setValue(total);
+        }, 1000);
     }
 
     handleSaveDetail(args: any) {
+        this.ShowFormDetailDialog = true;
+
         this.GridProps.dataSource = [
             ...this.GridProps.dataSource,
             { urut: this.GridProps.dataSource.length + 1, ...args }
