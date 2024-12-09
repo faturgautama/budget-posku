@@ -1,0 +1,124 @@
+<app-layout>
+    <div class="flex flex-col gap-3">
+        <div class="flex justify-between items-center bg-white rounded-md p-3 w-full">
+            <div class="flex flex-col gap-0">
+                <p class="text-blue-500 text-lg font-semibold">
+                    Pembelian
+                </p>
+                <p class="text-gray-600 text-xs">
+                    Tambah pembelian barang Anda disini
+                </p>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <p-button styleClass="p-button-sm p-button-secondary" label="Kembali" icon="pi pi-chevron-left">
+                </p-button>
+
+                <p-button styleClass="p-button-sm p-button-info" label="Simpan" icon="pi pi-save">
+                </p-button>
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-3 w-full bg-white rounded-md p-3">
+            <!-- Header -->
+            <div class="grid grid-cols-3 gap-4 mb-1 pb-4 border-b border-t-0 border-x-0 border-dashed border-gray-300"
+                [formGroup]="Form">
+                <!-- Tgl Pembelian -->
+                <div class="flex flex-col w-full gap-1">
+                    <p class="text-gray-600 text-sm">
+                        Tgl. Pembelian
+                    </p>
+                    <p-calendar styleClass="p-inputtext-sm w-full" formControlName="tanggal_pembelian"
+                        dateFormat="dd MM yy"></p-calendar>
+                </div>
+
+                <!-- Tgl Pembelian -->
+                <div class="flex flex-col w-full gap-1">
+                    <p class="text-gray-600 text-sm">
+                        No. Faktur
+                    </p>
+                    <input type="text" pInputText class="p-inputtext-sm w-full" formControlName="no_faktur">
+                </div>
+
+                <!-- Nama Supplier -->
+                <div class="flex flex-col w-full gap-1">
+                    <p class="text-gray-600 text-sm">
+                        Nama Supplier
+                    </p>
+                    <input type="text" pInputText class="p-inputtext-sm w-full" formControlName="nama_supplier">
+                </div>
+            </div>
+
+            <!-- Detail -->
+            <div class="grid">
+                <app-grid [props]="GridProps" (toolbarClicked)="handleToolbarClicked($event)">
+                </app-grid>
+            </div>
+
+            <!-- Dialog Barang -->
+            <p-dialog header="{{IsFormDetailInsert ? 'Tambah' : 'Edit'}} Product" [modal]="true" [draggable]="false"
+                [resizable]="false" [(visible)]="ShowFormDetailDialog" [style]="{ width: '35rem' }">
+
+                <div class="flex flex-col w-full gap-3 mb-3" [formGroup]="FormDetail">
+                    <!-- Product -->
+                    <div class="flex flex-col w-full gap-1">
+                        <p class="text-gray-600 text-sm">
+                            Product
+                        </p>
+                        <p-dropdown [options]="BarangDatasource" optionLabel="nama_barang"
+                            styleClass="p-inputtext-sm w-full" [filter]="true" appendTo="body"
+                            [autoDisplayFirst]="false" (onChange)="handleChangeDropdownBarang($event)">
+                        </p-dropdown>
+                    </div>
+
+                    <!-- Tgl Pembelian -->
+                    <div class="flex flex-col w-full gap-1">
+                        <p class="text-gray-600 text-sm">
+                            Satuan
+                        </p>
+                        <input type="text" pInputText readonly class="p-inputtext-sm w-full"
+                            formControlName="nama_satuan">
+                    </div>
+
+                    <!-- Qty -->
+                    <div class="flex flex-col w-full gap-1">
+                        <p class="text-gray-600 text-sm">
+                            Qty
+                        </p>
+                        <p-inputNumber styleClass="p-inputtext-sm w-full" formControlName="qty"
+                            (ngModelChange)="handleCountTotalDetail($event)">
+                        </p-inputNumber>
+                    </div>
+
+                    <!-- Harga Beli -->
+                    <div class="flex flex-col w-full gap-1">
+                        <p class="text-gray-600 text-sm">
+                            Harga Beli
+                        </p>
+                        <p-inputNumber styleClass="p-inputtext-sm w-full" formControlName="harga_beli"
+                            (ngModelChange)="handleCountTotalDetail($event)">
+                        </p-inputNumber>
+                    </div>
+
+                    <!-- Total -->
+                    <div class="flex flex-col w-full gap-1">
+                        <p class="text-gray-600 text-sm">
+                            Total
+                        </p>
+                        <p-inputNumber styleClass="p-inputtext-sm w-full" formControlName="total" [readonly]="true">
+                        </p-inputNumber>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2">
+                    <p-button label="Cancel" styleClass="p-button-sm p-button-secondary"
+                        (onClick)="ShowFormDetailDialog = false" />
+
+                    <p-button label="Save" styleClass="p-button-sm p-button-info"
+                        (onClick)="handleSaveDetail(FormDetail.value)" />
+                </div>
+            </p-dialog>
+
+        </div>
+    </div>
+</app-layout>

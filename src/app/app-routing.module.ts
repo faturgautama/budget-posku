@@ -56,6 +56,25 @@ const routes: Routes = [
             },
         ]
     },
+    {
+        path: 'pembelian',
+        // canActivate: [AuthGuard],
+        children: [
+            {
+                path: 'history',
+                loadComponent: async () => (await import('./feature/pembelian/history-pembelian/history-pembelian.component')).HistoryPembelianComponent
+            },
+            {
+                path: 'input',
+                loadComponent: async () => (await import('./feature/pembelian/input-pembelian/input-pembelian.component')).InputPembelianComponent
+            },
+        ]
+    },
+    {
+        path: 'kartu-stok',
+        // canActivate: [AuthGuard],
+        loadComponent: async () => (await import('./feature/kartu-stok/kartu-stok.component')).KartuStokComponent
+    },
 ];
 
 @NgModule({

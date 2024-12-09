@@ -24,6 +24,9 @@ export namespace DbModel {
         ukuran?: string;
         harga_jual: string;
         jumlah_stok?: number;
+        created_at: string;
+        image?: any;
+        is_active: boolean;
     }
 
     export interface MetodeBayar {
@@ -100,7 +103,7 @@ export namespace DbModel {
         nilai_keluar?: number;
         saldo_akhir?: number;
         keterangan?: string;
-        created_at: string;
+        created_at: Date;
     }
 
     export interface StokBarang {

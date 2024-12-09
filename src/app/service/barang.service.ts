@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { db } from '../db/db';
 import { DbModel } from '../db/db.model';
+import { formatDate } from '@angular/common';
 
 @Injectable({
     providedIn: 'root'
@@ -92,6 +93,35 @@ export class BarangService {
         }
     }
 
+    async getById(id_barang: number): Promise<[boolean, DbModel.Barang]> {
+        try {
+            const satuan = await db.satuan.toArray();
+
+            const result = await db.barang
+                .where({ id_barang: id_barang })
+                .first()
+                .then((item) => {
+                    const nama_satuan = satuan.find((sat) => { return sat.id == item?.id_satuan })?.nama_satuan;
+
+                    const payload = {
+                        ...item,
+                        nama_satuan: nama_satuan,
+                    };
+
+                    return payload;
+                })
+
+            if (result) {
+                return [true, result as any]
+            } else {
+                return [false, null as any]
+            }
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async insert(data: DbModel.Barang): Promise<[boolean, string]> {
         try {
             const result = await db.barang.add({
@@ -99,14 +129,28 @@ export class BarangService {
                 nama_barang: data.nama_barang,
                 barcode: data.barcode,
                 harga_jual: data.harga_jual,
+                brand: data.brand ? data.brand : "",
+                ukuran: data.ukuran ? data.ukuran : "",
                 jumlah_stok: data.jumlah_stok ? data.jumlah_stok : 0,
+                created_at: formatDate(new Date(), 'yyyy-MM-dd', 'EN'),
+                image: data.image ? data.image : null,
+                is_active: true,
             });
 
-            if (result) {
-                return [true, "Data Berhasil Disimpan"]
-            } else {
+            if (!result) {
                 return [false, "Data Gagal Disimpan"];
-            }
+            };
+
+            const initKartuStok = await db.saldoBarang.add({
+                id_barang: result,
+                sisa_stok: 0,
+            });
+
+            if (!initKartuStok) {
+                return [false, "Saldo Stok Gagal Disimpan"];
+            };
+
+            return [true, "Data Berhasil Disimpan"]
 
         } catch (error) {
             throw error;
@@ -121,7 +165,12 @@ export class BarangService {
                 nama_barang: data.nama_barang,
                 barcode: data.barcode,
                 harga_jual: data.harga_jual,
+                brand: data.brand ? data.brand : "",
+                ukuran: data.ukuran ? data.ukuran : "",
                 jumlah_stok: data.jumlah_stok ? data.jumlah_stok : 0,
+                created_at: data.created_at,
+                image: data.image ? data.image : null,
+                is_active: data.is_active,
             });
 
             if (result) {
@@ -162,6 +211,11 @@ export class BarangService {
                     barcode: barang.barcode,
                     harga_jual: barang.harga_jual,
                     jumlah_stok: barang?.jumlah_stok! - qty,
+                    brand: barang.brand ? barang.brand : "",
+                    ukuran: barang.ukuran ? barang.ukuran : "",
+                    created_at: barang.created_at,
+                    image: barang.image ? barang.image : null,
+                    is_active: barang.is_active,
                 });
 
                 if (result) {

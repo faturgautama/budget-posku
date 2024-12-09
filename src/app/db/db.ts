@@ -30,7 +30,7 @@ export class AppDB extends Dexie {
             pembelian: '++id',
             pembelianDetail: '++id, id_pembelian, id_barang',
             kartuStok: '++id, id_barang',
-            stokBarang: '++id, id_barang',
+            saldoBarang: '++id, id_barang',
             counter: '++id, prefix',
         });
 
@@ -38,12 +38,13 @@ export class AppDB extends Dexie {
     }
 
     async populate() {
-        // await db.counter.add({
-        //     prefix: 'PJ',
-        //     counter: 0,
+        // await db.saldoBarang.add({
+        //     id: 1,
+        //     id_barang: 0,
+        //     sisa_stok: 0,
         // });
 
-        // console.log(db.counter.toArray());
+        console.log(db.saldoBarang.toArray());
     }
 }
 

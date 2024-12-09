@@ -138,17 +138,24 @@ export class SetupBarangComponent implements OnInit, OnDestroy {
             nama_barang: ["", [Validators.required]],
             id_satuan: [0, [Validators.required]],
             barcode: ["", [Validators.required]],
+            brand: ["", []],
+            ukuran: ["", [Validators.required]],
             harga_jual: [0, [Validators.required]],
-            jumlah_stok: [0, [Validators.required]],
+            jumlah_stok: [0, []],
+            image: ["", []],
+            is_active: [true, []],
         })
     }
 
     ngOnInit(): void {
         this.getData();
+
+
     }
 
     getData(): void {
-        this._barangService.getAll()
+        this._barangService
+            .getAll()
             .then((result) => {
                 if (result[0]) {
                     this.GridProps.dataSource = result[1];
@@ -165,6 +172,10 @@ export class SetupBarangComponent implements OnInit, OnDestroy {
         this.Form.get('barcode')?.setValue(args.barcode);
         this.Form.get('harga_jual')?.setValue(args.harga_jual);
         this.Form.get('jumlah_stok')?.setValue(args.jumlah_stok);
+        this.Form.get('brand')?.setValue(args.brand);
+        this.Form.get('ukuran')?.setValue(args.ukuran);
+        this.Form.get('image')?.setValue(args.image);
+        this.Form.get('is_active')?.setValue(args.is_active);
     }
 
     onClickButtonAdd(): void {
@@ -172,9 +183,32 @@ export class SetupBarangComponent implements OnInit, OnDestroy {
         this.Form.reset();
     }
 
+    handleChangeImage(args: any) {
+        const file = args.target.files[0];
+
+        if (file) {
+            if (file.size > 1048576) {
+                this._messageService.clear();
+                this._messageService.add({ severity: 'error', summary: 'Oops', detail: 'File size tidak boleh > 1 MB' });
+            } else {
+                this.Form.get('image')?.setValue("");
+
+                const reader = new FileReader();
+
+                reader.onload = () => {
+                    const base64string = reader.result as string;
+                    this.Form.get('image')?.setValue(base64string);
+                };
+
+                reader.readAsDataURL(file);
+            }
+        }
+    }
+
     handleSave(): void {
         if (this._utilityService.checkValidator(this.Form)) {
-            this._barangService.insert(this.Form.value)
+            this._barangService
+                .insert(this.Form.value)
                 .then((result) => {
                     this._messageService.clear();
 
@@ -190,7 +224,8 @@ export class SetupBarangComponent implements OnInit, OnDestroy {
     }
 
     handleUpdate(): void {
-        this._barangService.update(this.Form.value)
+        this._barangService
+            .update(this.Form.value)
             .then((result) => {
                 this._messageService.clear();
 

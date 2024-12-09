@@ -26,29 +26,42 @@ export class LayoutComponent {
             icon: 'pi pi-home'
         },
         {
-            path: 'setup-lokasi',
-            title: 'Setup Lokasi',
-            icon: 'pi pi-building'
+            path: 'setup-data',
+            title: 'Setup Data',
+            icon: 'pi pi-cog',
+            toggle_child: false,
+            children: [
+                {
+                    path: 'setup-lokasi',
+                    title: 'Setup Lokasi',
+                    icon: 'pi pi-building'
+                },
+                {
+                    path: 'setup-satuan',
+                    title: 'Setup Satuan',
+                    icon: 'pi pi-qrcode'
+                },
+                {
+                    path: 'setup-barang',
+                    title: 'Setup Produk',
+                    icon: 'pi pi-box'
+                },
+                {
+                    path: 'setup-metode-bayar',
+                    title: 'Setup Metode Bayar',
+                    icon: 'pi pi-sitemap'
+                },
+                {
+                    path: 'setup-bank',
+                    title: 'Setup Bank',
+                    icon: 'pi pi-credit-card'
+                },
+            ]
         },
         {
-            path: 'setup-satuan',
-            title: 'Setup Satuan',
-            icon: 'pi pi-qrcode'
-        },
-        {
-            path: 'setup-barang',
-            title: 'Setup Produk',
-            icon: 'pi pi-box'
-        },
-        {
-            path: 'setup-metode-bayar',
-            title: 'Setup Metode Bayar',
-            icon: 'pi pi-sitemap'
-        },
-        {
-            path: 'setup-bank',
-            title: 'Setup Bank',
-            icon: 'pi pi-credit-card'
+            path: 'pembelian/history',
+            title: 'Pembelian',
+            icon: 'pi pi-inbox'
         },
         {
             path: 'pos-kasir',
@@ -56,10 +69,23 @@ export class LayoutComponent {
             icon: 'pi pi-desktop'
         },
         {
-            path: 'penjualan/laporan',
-            title: 'Laporan Penjualan',
-            icon: 'pi pi-file'
-        },
+            path: 'laporan',
+            title: 'Laporan',
+            icon: 'pi pi-file',
+            toggle_child: false,
+            children: [
+                {
+                    path: 'penjualan/laporan',
+                    title: 'Laporan Penjualan',
+                    icon: 'pi pi-money-bill'
+                },
+                {
+                    path: 'kartu-stok',
+                    title: 'Kartu Stok',
+                    icon: 'pi pi-book'
+                },
+            ]
+        }
     ]
 
     constructor(
@@ -95,6 +121,14 @@ export class LayoutComponent {
                 for (const item of menus) {
                     item.classList.add('onlyIcon')
                 }
+
+                this.Menu = this.Menu.map((item: any) => {
+                    if (item.children) {
+                        item.toggle_child = false;
+                    };
+
+                    return item;
+                })
             }
         }, 250);
     }

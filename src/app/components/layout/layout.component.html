@@ -23,12 +23,32 @@
         <!-- Sidebar -->
         <div id="sidebar" class="w-16 transition-all flex flex-col items-start p-4 bg-white rounded-md"
             (mouseenter)="handleHover('enter')" (mouseleave)="handleHover('leave')">
-            <div *ngFor="let item of Menu" class="flex justify-center items-center divMenus w-full mb-5 cursor-pointer"
-                (click)="handleNavigate(item.path)">
-                <i class="{{ item.icon }} text-gray-600" style="font-size: 12px"></i>
-                <p class="text-gray-700 text-sm ml-2 menus onlyIcon">
-                    {{ item.title }}
-                </p>
+            <div *ngFor="let item of Menu" class="flex flex-col w-full mb-5">
+                <div class="flex flex-row w-full justify-center items-center divMenus cursor-pointer"
+                    (click)="item.children ? item.toggle_child = !item.toggle_child : handleNavigate(item.path)">
+                    <i *ngIf="item.children"
+                        class="pi pi-chevron-{{item.toggle_child ? 'down' : 'right'}} text-gray-600 mr-3 menus onlyIcon"
+                        style="font-size: 10px">
+                    </i>
+
+                    <i class="{{ item.icon }} text-gray-600" style="font-size: 12px"></i>
+
+                    <p class="text-gray-700 text-sm ml-2 menus onlyIcon">
+                        {{ item.title }}
+                    </p>
+                </div>
+
+                <div *ngIf="item.children && item.toggle_child" class="flex flex-col gap-4 w-full mt-5 pl-5">
+                    <div *ngFor="let child of item.children"
+                        class="flex flex-row w-full items-center divMenus cursor-pointer"
+                        (click)="handleNavigate(child.path)">
+                        <i class="{{ child.icon }} text-gray-600" style="font-size: 12px"></i>
+
+                        <p class="text-gray-700 text-sm ml-2">
+                            {{ child.title }}
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
 
