@@ -14,7 +14,7 @@ import { LayoutComponent } from 'src/app/components/layout/layout.component';
 import { GridComponent, GridModel } from 'src/app/components/grid/grid.component';
 import { DialogModule } from 'primeng/dialog';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
     selector: 'app-input-pembelian',
@@ -37,6 +37,8 @@ import { Router } from '@angular/router';
     ]
 })
 export class InputPembelianComponent implements OnInit {
+
+    IsDetail = false;
 
     Form: FormGroup;
 
@@ -70,7 +72,7 @@ export class InputPembelianComponent implements OnInit {
         private _router: Router,
         private _formBuilder: FormBuilder,
         private _barangService: BarangService,
-        private _utilityService: UtilityService,
+        private _activatedRoute: ActivatedRoute,
         private _messageService: MessageService,
         private _pembelianService: PembelianService,
         private _confirmationService: ConfirmationService,
@@ -98,6 +100,25 @@ export class InputPembelianComponent implements OnInit {
     ngOnInit(): void {
         this.getAllBarang();
         this.generateFaktur();
+
+        const url = this._router.url;
+
+        if (url.includes('detail')) {
+            this.IsDetail = true;
+            this.getDetailPembelian(this._activatedRoute.snapshot.params['id']);
+            this.GridProps.toolbar = [];
+        }
+    }
+
+    private getDetailPembelian(id: number) {
+        this._pembelianService
+            .getDetail(id)
+            .then((result) => {
+                if (result[0]) {
+                    this.Form.patchValue(result[1]);
+                    this.GridProps.dataSource = result[1].detail;
+                }
+            })
     }
 
     private getAllBarang() {

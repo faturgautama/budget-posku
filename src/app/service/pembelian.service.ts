@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { db } from '../db/db';
 import { DbModel } from '../db/db.model';
 import { KartuStokService } from './kartu-stok.service';
+import { BarangService } from './barang.service';
 
 @Injectable({
     providedIn: 'root'
@@ -9,6 +10,7 @@ import { KartuStokService } from './kartu-stok.service';
 export class PembelianService {
 
     constructor(
+        private _barangService: BarangService,
         private _kartuStokService: KartuStokService,
     ) { }
 
@@ -27,7 +29,7 @@ export class PembelianService {
         }
     }
 
-    async getDetail(id_pembelian: number): Promise<[boolean, DbModel.Pembelian]> {
+    async getDetail(id_pembelian: number): Promise<[boolean, any]> {
         try {
             const result: any = await db.pembelian.get(parseInt(id_pembelian as any));
 
@@ -47,17 +49,29 @@ export class PembelianService {
         }
     }
 
-    async getDetailPembelian(id_pembelian: number): Promise<[boolean, DbModel.PembelianDetail[]]> {
+    private async getDetailPembelian(id_pembelian: number): Promise<DbModel.PembelianDetail[]> {
         try {
-            const result: any[] = await db.pembelianDetail
+            const detail: any[] = await db.pembelianDetail
                 .where({ id_pembelian: parseInt(id_pembelian as any) })
-                .toArray()
+                .toArray();
 
-            if (result) {
-                return [true, result]
-            } else {
-                return [false, []]
+            let result: any[] = [];
+
+            for (const item of detail) {
+                const barang = await this._barangService.getById(item.id_barang);
+
+                result.push({
+                    ...item,
+                    nama_barang: barang[1].nama_barang,
+                    nama_satuan: barang[1].nama_satuan,
+                })
             }
+
+            if (!result) {
+                return [];
+            }
+
+            return result;
 
         } catch (error) {
             throw error;

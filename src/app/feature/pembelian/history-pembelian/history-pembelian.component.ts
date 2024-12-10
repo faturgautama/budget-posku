@@ -106,7 +106,7 @@ export class HistoryPembelianComponent implements OnInit {
     }
 
     onRowDoubleClicked(args: any): void {
-        console.log(args);
+        this._router.navigateByUrl(`pembelian/detail/${args.id}`)
     }
 
     onCellClicked(args: any) {

@@ -6,7 +6,7 @@
                     Pembelian
                 </p>
                 <p class="text-gray-600 text-xs">
-                    Tambah pembelian barang Anda disini
+                    {{ IsDetail ? 'Lihat detail' : 'Tambah'}} pembelian barang Anda disini
                 </p>
             </div>
 
@@ -15,7 +15,7 @@
                     (onClick)="handleBackToList()">
                 </p-button>
 
-                <p-button styleClass="p-button-sm p-button-info" label="Simpan" icon="pi pi-save"
+                <p-button *ngIf="!IsDetail" styleClass="p-button-sm p-button-info" label="Simpan" icon="pi pi-save"
                     (onClick)="handleSubmitForm()">
                 </p-button>
             </div>
@@ -31,7 +31,8 @@
                         Tgl. Pembelian
                     </p>
                     <p-calendar styleClass="p-inputtext-sm w-full" formControlName="tanggal_pembelian"
-                        dateFormat="dd MM yy"></p-calendar>
+                        dateFormat="dd MM yy">
+                    </p-calendar>
                 </div>
 
                 <!-- Tgl Pembelian -->

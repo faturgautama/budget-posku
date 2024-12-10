@@ -68,6 +68,10 @@ const routes: Routes = [
                 path: 'input',
                 loadComponent: async () => (await import('./feature/pembelian/input-pembelian/input-pembelian.component')).InputPembelianComponent
             },
+            {
+                path: 'detail/:id',
+                loadComponent: async () => (await import('./feature/pembelian/input-pembelian/input-pembelian.component')).InputPembelianComponent
+            },
         ]
     },
     {
