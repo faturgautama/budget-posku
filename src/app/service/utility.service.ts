@@ -6,6 +6,8 @@ import { importDB, exportDB } from "dexie-export-import";
 import * as download from 'downloadjs';
 import { LokasiService } from './lokasi.service';
 import { formatDate } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 
 @Injectable({
@@ -16,6 +18,7 @@ export class UtilityService {
     version: string = "0.1.0";
 
     constructor(
+        private _http: HttpClient,
         private _lokasiService: LokasiService,
         private _messageService: MessageService
     ) { }
@@ -44,8 +47,6 @@ export class UtilityService {
         try {
             const lokasi = await this._lokasiService.getAll();
 
-            console.log("LOKASI =>", db.counter.toArray());
-
             const blob = await exportDB(db, { prettyJson: true });
 
             if (lokasi[0]) {
@@ -53,6 +54,38 @@ export class UtilityService {
             } else {
                 download(blob, `db_backup_${formatDate(new Date(), 'yyyy-MM-ddTHH:mm:ss', 'EN')}.json`, '"application/json"')
             }
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async onPushToFirebase() {
+        try {
+            const data = {
+                lokasi: await db.lokasi.toArray(),
+                satuan: await db.satuan.toArray(),
+                barang: await db.barang.toArray(),
+                metodeBayar: await db.metodeBayar.toArray(),
+                bank: await db.bank.toArray(),
+                penjualan: await db.penjualan.toArray(),
+                penjualanDetail: await db.penjualanDetail.toArray(),
+                penjualanDetailPayment: await db.penjualanDetailPayment.toArray(),
+                pembelian: await db.pembelian.toArray(),
+                pembelianDetail: await db.pembelianDetail.toArray(),
+                kartuStok: await db.kartuStok.toArray(),
+                saldoBarang: await db.saldoBarang.toArray(),
+                counter: await db.counter.toArray(),
+            };
+
+            this._http
+                .patch(`${environment.firebase}/data.json`, data)
+                .subscribe((result) => {
+                    console.log(result);
+                }, (error) => {
+                    console.log(error);
+                })
+
 
         } catch (error) {
             throw error;

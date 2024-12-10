@@ -144,4 +144,12 @@ export class BerandaComponent implements OnInit {
             throw error;
         }
     }
+
+    async onSyncFirebase() {
+        try {
+            await this._utilityService.onPushToFirebase();
+        } catch (error) {
+            throw error;
+        }
+    }
 }

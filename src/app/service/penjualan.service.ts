@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { db } from '../db/db';
 import { DbModel } from '../db/db.model';
 import { KartuStokService } from './kartu-stok.service';
+import { BarangService } from './barang.service';
 
 @Injectable({
     providedIn: 'root'
@@ -9,6 +10,7 @@ import { KartuStokService } from './kartu-stok.service';
 export class PenjualanService {
 
     constructor(
+        private _barangService: BarangService,
         private _kartuStokService: KartuStokService,
     ) { }
 
@@ -48,24 +50,37 @@ export class PenjualanService {
         }
     }
 
-    async getDetailPenjualan(id_penjualan: number): Promise<[boolean, DbModel.PenjualanDetail[]]> {
+    async getDetailPenjualan(id_penjualan: number): Promise<DbModel.PenjualanDetail[]> {
         try {
-            const result: any[] = await db.penjualanDetail.where({
-                id_penjualan: parseInt(id_penjualan as any),
-            }).toArray()
+            const detail: any[] = await db.penjualanDetail
+                .where({ id_penjualan: parseInt(id_penjualan as any) })
+                .toArray()
 
-            if (result) {
-                return [true, result]
-            } else {
-                return [false, []]
+            let result: any[] = [];
+
+            for (const item of detail) {
+                const barang = await this._barangService.getById(item.id_barang);
+
+                result.push({
+                    ...item,
+                    nama_barang: barang[1].nama_barang,
+                    barcode: barang[1].barcode,
+                    nama_satuan: barang[1].nama_satuan,
+                })
             }
+
+            if (!result) {
+                return [];
+            }
+
+            return result;
 
         } catch (error) {
             throw error;
         }
     }
 
-    async getDetailPayment(id_penjualan: number): Promise<[boolean, DbModel.PenjualanDetailPayment[]]> {
+    async getDetailPayment(id_penjualan: number): Promise<DbModel.PenjualanDetailPayment[]> {
         try {
             const payment_method = await db.metodeBayar.toArray();
             const bank = await db.bank.toArray();
@@ -89,9 +104,9 @@ export class PenjualanService {
                 })
 
             if (result) {
-                return [true, result]
+                return result
             } else {
-                return [false, []]
+                return []
             }
 
         } catch (error) {
@@ -175,7 +190,7 @@ export class PenjualanService {
             const detailPenjualan = await this.getDetailPenjualan(id);
 
             if (detailPenjualan[0]) {
-                for (const item of detailPenjualan[1]) {
+                for (const item of detailPenjualan) {
                     await db.penjualanDetail.delete(item.id as number);
                 }
 

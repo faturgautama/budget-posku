@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatCurrency } from '@angular/common';
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { GridComponent, GridModel } from 'src/app/components/grid/grid.component';
@@ -103,8 +103,9 @@ export class SetupBarangComponent implements OnInit, OnDestroy {
         column: [
             { field: 'nama_barang', headerName: 'NAMA PRODUK', flex: 300, sortable: true, resizable: true },
             { field: 'barcode', headerName: 'BARCODE', flex: 150, sortable: true, resizable: true },
-            { field: 'harga_jual', headerName: 'HARGA JUAL', flex: 150, sortable: true, resizable: true },
-            { field: 'jumlah_stok', headerName: 'JUMLAH STOK', flex: 120, sortable: true, resizable: true },
+            { field: 'nama_satuan', headerName: 'SATUAN', flex: 150, sortable: true, resizable: true },
+            { field: 'nama_satuan', headerName: 'SATUAN', flex: 150, sortable: true, resizable: true },
+            { field: 'harga_jual', headerName: 'HARGA JUAL', flex: 150, sortable: true, resizable: true, cellClass: 'text-end', cellRenderer: (e: any) => { return formatCurrency(e.value, 'EN', 'Rp. ') } },
         ],
         dataSource: [],
         height: "calc(100vh - 12rem)",
@@ -139,7 +140,7 @@ export class SetupBarangComponent implements OnInit, OnDestroy {
             id_satuan: [0, [Validators.required]],
             barcode: ["", [Validators.required]],
             brand: ["", []],
-            ukuran: ["", [Validators.required]],
+            ukuran: [0, [Validators.required]],
             harga_jual: [0, [Validators.required]],
             jumlah_stok: [0, []],
             image: ["", []],
@@ -149,8 +150,6 @@ export class SetupBarangComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.getData();
-
-
     }
 
     getData(): void {
@@ -158,6 +157,7 @@ export class SetupBarangComponent implements OnInit, OnDestroy {
             .getAll()
             .then((result) => {
                 if (result[0]) {
+                    console.log(result[1]);
                     this.GridProps.dataSource = result[1];
                     this.Form.reset();
                 }
@@ -234,6 +234,8 @@ export class SetupBarangComponent implements OnInit, OnDestroy {
                 } else {
                     this._messageService.add({ severity: 'error', summary: 'Oops', detail: result[1] })
                 }
+
+                this.FormState = 'list';
 
                 this.getData();
             })

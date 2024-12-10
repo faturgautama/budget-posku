@@ -171,19 +171,20 @@ export class PenjualanComponent implements OnInit, OnDestroy {
     }
 
     getAll(): void {
-        from(this._penjualanService.getAll()).pipe(
-            takeUntil(this.Destroy$),
-            map((result: any) => {
-                if (result[0]) {
-                    return result[1]
-                } else {
-                    return []
-                }
+        from(this._penjualanService
+            .getAll()).pipe(
+                takeUntil(this.Destroy$),
+                map((result: any) => {
+                    if (result[0]) {
+                        return result[1]
+                    } else {
+                        return []
+                    }
+                })
+            ).subscribe((result) => {
+                console.log(result);
+                this.GridProps.dataSource = result;
             })
-        ).subscribe((result) => {
-            console.log(result);
-            this.GridProps.dataSource = result;
-        })
     }
 
     getDetail(id: number): void {
@@ -198,8 +199,9 @@ export class PenjualanComponent implements OnInit, OnDestroy {
                     }
                 })
             ).subscribe((result) => {
-                this.GridDetailProps.dataSource = result.detail[1];
-                this.GridDetailPaymentProps.dataSource = result.detail_payment[1];
+                console.log(result);
+                this.GridDetailProps.dataSource = result.detail;
+                this.GridDetailPaymentProps.dataSource = result.detail_payment;
             })
     }
 

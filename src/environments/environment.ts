@@ -4,7 +4,7 @@
 
 export const environment = {
     production: false,
-    endpoint: 'http://203.175.10.195/trijuna_retail_backend/public/api',
+    firebase: 'https://ban-sinar-amanah-default-rtdb.asia-southeast1.firebasedatabase.app/',
 };
 
 /*
