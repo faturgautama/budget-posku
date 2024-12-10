@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -11,6 +11,7 @@ import { BankService } from 'src/app/service/bank.service';
 import { DocumentService } from 'src/app/service/document.service';
 import { UtilityService } from 'src/app/service/utility.service';
 import { KartuStokService } from 'src/app/service/kartu-stok.service';
+import { DialogModule } from 'primeng/dialog';
 
 @Component({
     selector: 'app-kartu-stok',
@@ -24,6 +25,7 @@ import { KartuStokService } from 'src/app/service/kartu-stok.service';
         ButtonModule,
         MenuModule,
         GridComponent,
+        DialogModule,
     ],
     templateUrl: './kartu-stok.component.html',
     styleUrls: ['./kartu-stok.component.scss']
@@ -71,13 +73,33 @@ export class KartuStokComponent implements OnInit {
         column: [
             { field: 'nama_barang', headerName: 'NAMA BARANG', flex: 150, sortable: true, resizable: true },
             { field: 'nama_satuan', headerName: 'NAMA SATUAN', flex: 150, sortable: true, resizable: true },
-            { field: 'sisa_stok', headerName: 'SISA STOK', flex: 150, sortable: true, resizable: true },
+            { field: 'sisa_stok', headerName: 'SISA STOK', flex: 150, sortable: true, resizable: true, cellClass: 'text-end' },
         ],
         dataSource: [],
-        height: "calc(100vh - 12rem)",
+        height: "calc(100vh - 15rem)",
         showPaging: true,
+        toolbar: ['Detail']
+    };
+
+    GridSelectedData: any;
+
+    GridDetailProps: GridModel.IGrid = {
+        column: [
+            { field: 'ref_id', headerName: 'REF ID', flex: 100, sortable: true, resizable: true },
+            { field: 'created_at', headerName: 'TANGGAL', flex: 150, sortable: true, resizable: true, cellRenderer: (e: any) => { return formatDate(e.value, 'dd-MM-yyyy HH:mm', 'EN') } },
+            { field: 'keterangan', headerName: 'KETERANGAN', flex: 170, sortable: true, resizable: true },
+            { field: 'saldo_awal', headerName: 'SALDO AWAL', flex: 130, sortable: true, resizable: true, cellClass: 'text-end' },
+            { field: 'nilai_masuk', headerName: 'NILAI MASUK', flex: 130, sortable: true, resizable: true, cellClass: 'text-end' },
+            { field: 'nilai_keluar', headerName: 'NILAI KELUAR', flex: 130, sortable: true, resizable: true, cellClass: 'text-end' },
+            { field: 'saldo_akhir', headerName: 'SALDO AKHIR', flex: 130, sortable: true, resizable: true, cellClass: 'text-end' },
+        ],
+        dataSource: [],
+        height: "calc(100vh - 20rem)",
+        showPaging: false,
         toolbar: []
     };
+
+    ShowDialogDetail = false;
 
     constructor(
         private _messageService: MessageService,
@@ -90,7 +112,7 @@ export class KartuStokComponent implements OnInit {
         this.getData();
     }
 
-    getData(): void {
+    private getData(): void {
         this._kartuStokService
             .getSaldoStokBarang()
             .then((result) => {
@@ -100,12 +122,29 @@ export class KartuStokComponent implements OnInit {
             })
     }
 
-    onRowDoubleClicked(args: any): void {
-        console.log("args =>", args);
+    onCellClicked(args: any) {
+        this.GridSelectedData = args;
     }
 
-    onClickButtonAdd(): void {
+    onRowDoubleClicked(args: any): void {
+        this.getDetailKartuStok(args.id_barang);
+    }
 
+    onToolbarClicked(args: any) {
+        if (args.id == 'detail') {
+            this.getDetailKartuStok(this.GridSelectedData.id_barang);
+        }
+    }
+
+    private getDetailKartuStok(id_barang: any) {
+        this._kartuStokService
+            .getKartuStokBarang(id_barang)
+            .then((result) => {
+                if (result[0]) {
+                    this.ShowDialogDetail = true;
+                    this.GridDetailProps.dataSource = result[1];
+                }
+            })
     }
 }
 

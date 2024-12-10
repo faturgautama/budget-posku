@@ -47,6 +47,7 @@ export namespace DbModel {
         jumlah_item?: number;
         grand_total: number;
         keterangan?: string;
+        status: string;
     }
 
     export interface PembelianDetail {
@@ -70,6 +71,7 @@ export namespace DbModel {
         biaya_lain?: number;
         total_transaksi: number;
         keterangan?: string;
+        status: string
     }
 
     export interface PenjualanDetail {

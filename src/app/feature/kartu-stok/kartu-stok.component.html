@@ -1,6 +1,6 @@
 <app-layout>
-    <!-- Table -->
-    <div *ngIf="FormState == 'list'" class="flex flex-col w-full gap-3">
+    <div class="flex flex-col w-full gap-3">
+        <!-- Header -->
         <div class="flex justify-between items-center bg-white rounded-md p-3 w-full">
             <div class="flex flex-col gap-0">
                 <p class="text-blue-500 text-lg font-semibold">
@@ -12,10 +12,6 @@
             </div>
 
             <div class="flex gap-1">
-                <!-- <p-button styleClass="p-button-sm p-button-secondary" label="Tambah" icon="pi pi-plus"
-                    (onClick)="onClickButtonAdd()">
-                </p-button> -->
-
                 <p-menu #menu [model]="items" [popup]="true"></p-menu>
                 <p-button styleClass="p-button-sm p-button-info" label="Export" (onClick)="menu.toggle($event)"
                     icon="pi pi-file">
@@ -23,9 +19,50 @@
             </div>
         </div>
 
-        <div class="grid">
-            <app-grid [props]="GridProps" (rowDoubleClicked)="onRowDoubleClicked($event)">
+        <!-- Table -->
+        <div class="grid bg-white rounded-md p-3 w-full">
+            <app-grid [props]="GridProps" (rowDoubleClicked)="onRowDoubleClicked($event)"
+                (cellClicked)="onCellClicked($event)" (toolbarClicked)="onToolbarClicked($event)">
             </app-grid>
         </div>
+
+        <!-- Dialog Detail -->
+        <p-dialog header="Detail Kartu Stok" [modal]="true" [draggable]="false" [resizable]="false"
+            [(visible)]="ShowDialogDetail" [style]="{ width: '90vw' }">
+
+            <div *ngIf="GridSelectedData"
+                class="flex w-full gap-3 mb-3 pb-3 border-b border-t-0 border-x-0 border-dashed border-gray-300">
+                <!-- Nama Barang -->
+                <div class="flex flex-col w-4/12 gap-1">
+                    <p class="text-gray-600 text-sm">
+                        Nama Barang
+                    </p>
+                    <input type="text" pInputText class="p-inputtext-sm w-full" [readOnly]="true"
+                        [(ngModel)]="GridSelectedData.nama_barang">
+                </div>
+
+                <!-- Nama Satuan -->
+                <div class="flex flex-col w-4/12 gap-1">
+                    <p class="text-gray-600 text-sm">
+                        Nama Satuan
+                    </p>
+                    <input type="text" pInputText class="p-inputtext-sm w-full" [readOnly]="true"
+                        [(ngModel)]="GridSelectedData.nama_satuan">
+                </div>
+
+                <!-- Barcode -->
+                <div class="flex flex-col w-4/12 gap-1">
+                    <p class="text-gray-600 text-sm">
+                        Barcode
+                    </p>
+                    <input type="text" pInputText class="p-inputtext-sm w-full" [readOnly]="true"
+                        [(ngModel)]="GridSelectedData.barcode">
+                </div>
+            </div>
+
+            <div class="grid w-full">
+                <app-grid [props]="GridDetailProps"></app-grid>
+            </div>
+        </p-dialog>
     </div>
 </app-layout>

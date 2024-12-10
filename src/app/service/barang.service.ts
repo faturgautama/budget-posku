@@ -97,19 +97,12 @@ export class BarangService {
         try {
             const satuan = await db.satuan.toArray();
 
-            const result = await db.barang
-                .where({ id_barang: id_barang })
-                .first()
-                .then((item) => {
-                    const nama_satuan = satuan.find((sat) => { return sat.id == item?.id_satuan })?.nama_satuan;
+            const barang = await db.barang.get({ id: id_barang })
 
-                    const payload = {
-                        ...item,
-                        nama_satuan: nama_satuan,
-                    };
-
-                    return payload;
-                })
+            let result = {
+                ...barang,
+                nama_satuan: satuan.find((sat) => { return sat.id == barang?.id_satuan })?.nama_satuan
+            };
 
             if (result) {
                 return [true, result as any]

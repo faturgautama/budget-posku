@@ -14,30 +14,48 @@ export class KartuStokService {
 
     async getSaldoStokBarang(): Promise<[boolean, DbModel.StokBarang[]]> {
         try {
-            console.log(db.saldoBarang);
+            let result: any[] = [];
 
-            const result: any[] = await db.saldoBarang
-                .toArray()
-                .then((item) => {
-                    return item.map(async (data) => {
-                        let result: any = {};
+            const saldoBarang: any[] = await db.saldoBarang.toArray();
 
-                        const barang = await this._barangService.getById(data.id_barang);
+            if (!saldoBarang) {
+                return [false, []]
+            }
 
-                        if (barang[0]) {
-                            result = {
-                                ...data,
-                                ...barang[1]
-                            }
-                        } else {
-                            result = { ...data };
-                        }
+            for (const item of saldoBarang) {
+                const barang = await this._barangService.getById(item.id_barang);
 
-                        return result;
-                    })
-                });
+                if (!barang) {
+                    result.push({ ...item });
+                } else {
+                    result.push({ ...item, ...barang[1] });
+                }
+            }
 
-            console.log("saldo stok =>", result);
+            return [true, result];
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getKartuStokBarang(id_barang: number): Promise<[boolean, DbModel.KartuStok[]]> {
+        try {
+            const kartuStokBarang = await db.kartuStok
+                .where({ id_barang: id_barang })
+                .toArray();
+
+            let result: any[] = [];
+
+            for (const item of kartuStokBarang) {
+                const barang = await this._barangService.getById(item.id_barang);
+
+                result.push({
+                    ...item,
+                    nama_barang: barang[1].nama_barang,
+                    nama_satuan: barang[1].nama_satuan,
+                })
+            }
 
             if (!result) {
                 return [false, []]
@@ -50,42 +68,7 @@ export class KartuStokService {
         }
     }
 
-    async getKartuStokBarang(id_barang: number): Promise<[boolean, DbModel.KartuStok[]]> {
-        try {
-            const result: any[] = await db.kartuStok
-                .where({ id_barang: id_barang })
-                .toArray()
-                .then((item) => {
-                    return item.map(async (data) => {
-                        let result: any = {};
-
-                        const barang = await this._barangService.getById(data.id_barang);
-
-                        if (barang[0]) {
-                            result = {
-                                ...data,
-                                ...barang[1]
-                            }
-                        } else {
-                            result = { ...data };
-                        }
-
-                        return result;
-                    })
-                })
-
-            if (!result) {
-                return [false, []]
-            }
-
-            return [true, result.length ? result[0] : null];
-
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async updateNilaiMasukBarang(id_barang: number, ref_id: number, nilai_masuk: number): Promise<[boolean, string]> {
+    async updateNilaiMasukBarang(id_barang: number, ref_id: number, nilai_masuk: number, keterangan: string): Promise<[boolean, string]> {
         try {
             return db.transaction('rw', db.kartuStok, db.saldoBarang, async () => {
                 const lastKartuStok = await db.kartuStok
@@ -94,20 +77,22 @@ export class KartuStokService {
 
                 let saldo_akhir = 0;
 
-                if (!lastKartuStok.length) {
+                if (lastKartuStok.length) {
                     saldo_akhir = lastKartuStok.length ? lastKartuStok[lastKartuStok.length - 1].saldo_akhir! : 0;
                 };
 
-                const result = await db.kartuStok.add({
+                const payloadInsert = {
                     id_barang: id_barang,
                     ref_id: ref_id,
                     saldo_awal: saldo_akhir,
                     nilai_masuk: nilai_masuk,
                     nilai_keluar: 0,
                     saldo_akhir: saldo_akhir + nilai_masuk,
-                    keterangan: 'MASUK PEMBELIAN',
+                    keterangan: keterangan ? keterangan : 'MASUK PEMBELIAN',
                     created_at: new Date(),
-                });
+                };
+
+                const result = await db.kartuStok.add(payloadInsert);
 
                 if (!result) {
                     throw new Error("Kartu Stok Gagal Disimpan");
@@ -135,7 +120,7 @@ export class KartuStokService {
         }
     }
 
-    async updateNilaiKeluarBarang(id_barang: number, ref_id: number, nilai_keluar: number): Promise<[boolean, string]> {
+    async updateNilaiKeluarBarang(id_barang: number, ref_id: number, nilai_keluar: number, keterangan: string): Promise<[boolean, string]> {
         try {
             return db.transaction('rw', db.kartuStok, db.saldoBarang, async () => {
                 const lastKartuStok = await db.kartuStok
@@ -144,7 +129,7 @@ export class KartuStokService {
 
                 let saldo_akhir = 0;
 
-                if (!lastKartuStok.length) {
+                if (lastKartuStok.length) {
                     saldo_akhir = lastKartuStok.length ? lastKartuStok[lastKartuStok.length - 1].saldo_akhir! : 0;
                 };
 
@@ -155,7 +140,7 @@ export class KartuStokService {
                     nilai_masuk: 0,
                     nilai_keluar: nilai_keluar,
                     saldo_akhir: saldo_akhir - nilai_keluar,
-                    keterangan: 'KELUAR PENJUALAN',
+                    keterangan: keterangan ? keterangan : 'KELUAR PENJUALAN',
                     created_at: new Date(),
                 });
 

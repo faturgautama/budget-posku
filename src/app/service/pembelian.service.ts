@@ -66,75 +66,74 @@ export class PembelianService {
 
     async insert(data: any): Promise<[boolean, any]> {
         try {
-            return db.transaction('rw', db.pembelian, db.pembelianDetail, async () => {
-                const result = await db.pembelian.add({
-                    tanggal_pembelian: data.tanggal_pembelian,
-                    no_faktur: data.no_faktur,
-                    nama_supplier: data.nama_supplier ? data.nama_supplier : '',
-                    jumlah_item: data.jumlah_item,
-                    grand_total: data.grand_total,
-                    keterangan: data.keterangan ? data.keterangan : "",
+            const result = await db.pembelian.add({
+                tanggal_pembelian: data.tanggal_pembelian,
+                no_faktur: data.no_faktur,
+                nama_supplier: data.nama_supplier ? data.nama_supplier : '',
+                jumlah_item: data.jumlah_item,
+                grand_total: data.grand_total,
+                keterangan: data.keterangan ? data.keterangan : "",
+                status: "OPEN",
+            });
+
+            if (!result) {
+                return [false, "Data Gagal Disimpan"];
+            }
+
+            for (let i = 0; i < data.detail.length; i++) {
+                const insertDetail = await db.pembelianDetail.add({
+                    id_pembelian: result,
+                    id_barang: data.detail[i].id_barang,
+                    qty: data.detail[i].qty,
+                    harga_beli: data.detail[i].harga_beli,
+                    total: data.detail[i].total,
                 });
 
-                if (!result) {
-                    // return [false, "Data Gagal Disimpan"];
-                    throw new Error("Pembelian Gagal Disimpan");
+                if (!insertDetail) {
+                    return [false, "Detail Pembelian Gagal Disimpan"];
                 }
 
-                const detail = data.detail.map(async (item: any) => {
-                    const insertKartuStok = await this._kartuStokService.updateNilaiMasukBarang(item.id_barang, result, item.qty);
+                const insertKartuStok = await this._kartuStokService.updateNilaiMasukBarang(data.detail[i].id_barang, result, data.detail[i].qty, 'MASUK PEMBELIAN');
 
-                    if (!insertKartuStok[0]) {
-                        throw new Error("Kartu Stok Gagal Disimpan");
-                    }
-
-                    return {
-                        id_pembelian: result,
-                        ...item
-                    }
-                });
-
-                const resultDetail = await db.pembelianDetail.bulkAdd(detail);
-
-                if (!resultDetail) {
-                    // return [false, "Data Detail Gagal Disimpan"];
-                    throw new Error("Pembelian Detail Gagal Disimpan");
+                if (!insertKartuStok[0]) {
+                    return [false, "Kartu Stok Gagal Disimpan"];
                 }
+            }
 
-                const updateCounter = await this.updateCounter();
+            const updateCounter = await this.updateCounter();
 
-                if (!updateCounter) {
-                    // return [false, "Gagal Update Counter"];
-                    throw new Error("Gagal Update Counter");
-                }
+            if (!updateCounter) {
+                return [false, "Gagal Update Counter"];
+            }
 
-                return [true, result];
-            })
+            return [true, result];
+
         } catch (error) {
             throw error;
         }
     }
 
-    async delete(id: number): Promise<[boolean, string]> {
+    async cancel(id: number): Promise<[boolean, string]> {
         try {
-            const detailPembelian = await this.getDetailPembelian(id);
+            const updateStatusPembelian = await db.pembelian.update(id, { status: "CANCEL" });
 
-            if (detailPembelian[0]) {
-                for (const item of detailPembelian[1]) {
-                    await db.pembelianDetail.delete(item.id as number);
-                }
-
-                const result: any = await db.pembelian.delete(id);
-
-                if (result) {
-                    return [true, "Data Berhasil Dihapus"]
-                } else {
-                    return [false, "Data Gagal Dihapus"];
-                }
-
-            } else {
-                return [false, "Data Gagal Dihapus"];
+            if (!updateStatusPembelian) {
+                return [false, "Gagal Cancel Pembelian"];
             }
+
+            const detail = await db.pembelianDetail
+                .where({ id_pembelian: id })
+                .toArray();
+
+            for (let i = 0; i < detail.length; i++) {
+                const insertKartuStok = await this._kartuStokService.updateNilaiKeluarBarang(detail[i].id_barang, id, parseInt(detail[i].qty), 'KELUAR BATAL PEMBELIAN');
+
+                if (!insertKartuStok[0]) {
+                    return [false, "Kartu Stok Gagal Disimpan"];
+                }
+            }
+
+            return [true, "Pembelian Berhasil Dibatalkan"]
 
         } catch (error) {
             throw error;

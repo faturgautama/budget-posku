@@ -101,68 +101,70 @@ export class PenjualanService {
 
     async insert(data: any): Promise<[boolean, any]> {
         try {
-            return db.transaction('rw', db.penjualan, db.penjualanDetail, db.penjualanDetailPayment, async () => {
-                const result = await db.penjualan.add({
-                    tanggal_penjualan: data.tanggal_penjualan,
-                    no_faktur: data.no_faktur,
-                    nama_customer: data.nama_customer ? data.nama_customer : '',
-                    jumlah_item: data.jumlah_item,
-                    grand_total: data.grand_total,
-                    ppn_persen: data.ppn_persen,
-                    ppn_rupiah: data.ppn_rupiah,
-                    biaya_lain: data.biaya_lain,
-                    total_transaksi: data.total_transaksi,
-                    keterangan: data.keterangan ? data.keterangan : "",
+            const result = await db.penjualan.add({
+                tanggal_penjualan: data.tanggal_penjualan,
+                no_faktur: data.no_faktur,
+                nama_customer: data.nama_customer ? data.nama_customer : '',
+                jumlah_item: data.jumlah_item,
+                grand_total: data.grand_total,
+                ppn_persen: data.ppn_persen,
+                ppn_rupiah: data.ppn_rupiah,
+                biaya_lain: data.biaya_lain,
+                total_transaksi: data.total_transaksi,
+                keterangan: data.keterangan ? data.keterangan : "",
+                status: "OPEN",
+            });
+
+            if (!result) {
+                return [false, "Penjualan Gagal Disimpan"];
+            };
+
+            for (let i = 0; i < data.detail.length; i++) {
+                const insertDetail = await db.penjualanDetail.add({
+                    id_penjualan: result,
+                    id_barang: data.detail[i].id_barang,
+                    qty: data.detail[i].qty,
+                    harga_jual: data.detail[i].harga_jual,
+                    total: data.detail[i].total,
                 });
 
-                if (!result) {
-                    // return [false, "Data Gagal Disimpan"];
-                    throw new Error("Penjualan Gagal Disimpan");
+                if (!insertDetail) {
+                    return [false, "Detail Penjualan Gagal Disimpan"];
                 }
 
-                const detail = data.detail.map(async (item: any) => {
-                    const insertKartuStok = await this._kartuStokService.updateNilaiKeluarBarang(item.id_barang, result, item.qty);
+                const insertKartuStok = await this._kartuStokService.updateNilaiKeluarBarang(data.detail[i].id_barang, result, data.detail[i].qty, 'KELUAR PENJUALAN');
 
-                    if (!insertKartuStok[0]) {
-                        throw new Error("Kartu Stok Gagal Disimpan");
-                    }
+                if (!insertKartuStok[0]) {
+                    return [false, "Kartu Stok Gagal Disimpan"];
+                }
+            }
 
-                    return {
-                        id_penjualan: result,
-                        ...item
-                    }
+            for (let i = 0; i < data.detail_payment.length; i++) {
+                const insertDetail = await db.penjualanDetailPayment.add({
+                    id_penjualan: result,
+                    id_metode_bayar: data.detail_payment[i].id_metode_bayar,
+                    id_bank: data.detail_payment[i].id_bank,
+                    total: data.detail_payment[i].total,
+                    diskon_persen: data.detail_payment[i].diskon_persen,
+                    diskon_rupiah: data.detail_payment[i].diskon_rupiah,
+                    total_payment_method: data.detail_payment[i].total_payment_method,
+                    jumlah_bayar: data.detail_payment[i].jumlah_bayar,
+                    kembalian: data.detail_payment[i].kembalian,
                 });
 
-                const resultDetail = await db.penjualanDetail.bulkAdd(detail);
-
-                if (!resultDetail) {
-                    // return [false, "Data Detail Gagal Disimpan"];
-                    throw new Error("Penjualan Detail Gagal Disimpan");
+                if (!insertDetail) {
+                    return [false, "Detail Payment Gagal Disimpan"];
                 }
+            }
 
-                const detailPayment = data.detail_payment.map((item: any) => {
-                    return {
-                        id_penjualan: result,
-                        ...item
-                    }
-                });
+            const updateCounter = await this.updateCounter();
 
-                const resultDetailPayment = await db.penjualanDetailPayment.bulkAdd(detailPayment);
+            if (!updateCounter) {
+                return [false, "Gagal Update Counter"];
+                // throw new Error("Gagal Update Counter");
+            }
 
-                if (!resultDetailPayment) {
-                    // return [false, "Data Payment Gagal Disimpan"];
-                    throw new Error("Penjualan Payment Gagal Disimpan");
-                }
-
-                const updateCounter = await this.updateCounter();
-
-                if (!updateCounter) {
-                    // return [false, "Gagal Update Counter"];
-                    throw new Error("Gagal Update Counter");
-                }
-
-                return [true, result];
-            })
+            return [true, result];
         } catch (error) {
             throw error;
         }

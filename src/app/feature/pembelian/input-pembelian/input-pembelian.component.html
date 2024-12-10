@@ -11,10 +11,12 @@
             </div>
 
             <div class="flex justify-end gap-2">
-                <p-button styleClass="p-button-sm p-button-secondary" label="Kembali" icon="pi pi-chevron-left">
+                <p-button styleClass="p-button-sm p-button-secondary" label="Kembali" icon="pi pi-chevron-left"
+                    (onClick)="handleBackToList()">
                 </p-button>
 
-                <p-button styleClass="p-button-sm p-button-info" label="Simpan" icon="pi pi-save">
+                <p-button styleClass="p-button-sm p-button-info" label="Simpan" icon="pi pi-save"
+                    (onClick)="handleSubmitForm()">
                 </p-button>
             </div>
         </div>
@@ -51,8 +53,40 @@
 
             <!-- Detail -->
             <div class="grid">
-                <app-grid [props]="GridProps" (toolbarClicked)="handleToolbarClicked($event)">
+                <app-grid [props]="GridProps" (toolbarClicked)="handleToolbarClicked($event)"
+                    (cellClicked)="handleCellClicked($event)">
                 </app-grid>
+            </div>
+
+            <!-- Footer -->
+            <div [formGroup]="Form" class="flex flex-col gap-2 w-full items-end">
+                <!-- Jumlah Item -->
+                <div class="flex flex-row items-center w-4/12 gap-1">
+                    <div class="w-4/12">
+                        <p class="text-gray-600 text-sm">
+                            Jumlah Item
+                        </p>
+                    </div>
+                    <div class="w-8/12">
+                        <p-inputNumber styleClass="p-inputtext-sm w-full" formControlName="jumlah_item"
+                            [readonly]="true">
+                        </p-inputNumber>
+                    </div>
+                </div>
+
+                <!-- Grand Total -->
+                <div class="flex flex-row items-center w-4/12 gap-1">
+                    <div class="w-4/12">
+                        <p class="text-gray-600 text-sm">
+                            Grand Total
+                        </p>
+                    </div>
+                    <div class="w-8/12">
+                        <p-inputNumber styleClass="p-inputtext-sm w-full" formControlName="grand_total"
+                            [readonly]="true">
+                        </p-inputNumber>
+                    </div>
+                </div>
             </div>
 
             <!-- Dialog Barang -->
@@ -65,7 +99,7 @@
                         <p class="text-gray-600 text-sm">
                             Product
                         </p>
-                        <p-dropdown [options]="BarangDatasource" optionLabel="nama_barang"
+                        <p-dropdown #BarangDropdown [options]="BarangDatasource" optionLabel="nama_barang"
                             styleClass="p-inputtext-sm w-full" [filter]="true" appendTo="body"
                             [autoDisplayFirst]="false" (onChange)="handleChangeDropdownBarang($event)">
                         </p-dropdown>
@@ -86,7 +120,7 @@
                             Qty
                         </p>
                         <p-inputNumber styleClass="p-inputtext-sm w-full" formControlName="qty"
-                            (ngModelChange)="handleCountTotalDetail($event)">
+                            (onBlur)="handleCountTotalDetail($event)">
                         </p-inputNumber>
                     </div>
 
@@ -96,7 +130,7 @@
                             Harga Beli
                         </p>
                         <p-inputNumber styleClass="p-inputtext-sm w-full" formControlName="harga_beli"
-                            (ngModelChange)="handleCountTotalDetail($event)">
+                            (onBlur)="handleCountTotalDetail($event)">
                         </p-inputNumber>
                     </div>
 
@@ -114,11 +148,16 @@
                     <p-button label="Cancel" styleClass="p-button-sm p-button-secondary"
                         (onClick)="ShowFormDetailDialog = false" />
 
-                    <p-button label="Save" styleClass="p-button-sm p-button-info"
+                    <p-button *ngIf="IsFormDetailInsert" label="Save" styleClass="p-button-sm p-button-info"
                         (onClick)="handleSaveDetail(FormDetail.value)" />
+
+                    <p-button *ngIf="!IsFormDetailInsert" label="Update" styleClass="p-button-sm p-button-warning"
+                        (onClick)="handleEditDetail(FormDetail.value)" />
                 </div>
             </p-dialog>
 
+            <!-- Confirmation Dialog -->
+            <p-confirmDialog></p-confirmDialog>
         </div>
     </div>
 </app-layout>
