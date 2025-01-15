@@ -125,6 +125,7 @@ export class BarangService {
                 brand: data.brand ? data.brand : "",
                 ukuran: data.ukuran ? data.ukuran : "",
                 jumlah_stok: data.jumlah_stok ? data.jumlah_stok : 0,
+                harga_beli_terakhir: 0,
                 created_at: formatDate(new Date(), 'yyyy-MM-dd', 'EN'),
                 image: data.image ? data.image : null,
                 is_active: true,
@@ -161,6 +162,7 @@ export class BarangService {
                 brand: data.brand ? data.brand : "",
                 ukuran: data.ukuran ? data.ukuran : "",
                 jumlah_stok: data.jumlah_stok ? data.jumlah_stok : 0,
+                harga_beli_terakhir: data.harga_beli_terakhir ? data.harga_beli_terakhir : 0,
                 created_at: data.created_at,
                 image: data.image ? data.image : null,
                 is_active: data.is_active,
@@ -225,4 +227,79 @@ export class BarangService {
         }
     }
 
+    async updateHargaBeliTerakhir(id_barang: number, harga_beli_terakhir: number): Promise<[boolean, string]> {
+        try {
+            const barang = await db.barang.get(id_barang);
+
+            if (barang) {
+                const result = await db.barang.put({
+                    id: barang?.id,
+                    id_satuan: barang.id_satuan,
+                    nama_barang: barang.nama_barang,
+                    barcode: barang.barcode,
+                    harga_jual: barang.harga_jual,
+                    jumlah_stok: barang?.jumlah_stok,
+                    harga_beli_terakhir: harga_beli_terakhir,
+                    brand: barang.brand ? barang.brand : "",
+                    ukuran: barang.ukuran ? barang.ukuran : "",
+                    created_at: barang.created_at,
+                    image: barang.image ? barang.image : null,
+                    is_active: barang.is_active,
+                });
+
+                if (result) {
+                    return [true, "Data Berhasil Diperbarui"]
+                } else {
+                    return [false, "Data Gagal Diperbarui"];
+                }
+            } else {
+                return [false, "Data Gagal Diperbarui"];
+            }
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async syncHargaBeliTerakhir(): Promise<[boolean, string]> {
+        try {
+            const barang = await db.barang.toArray();
+
+            if (barang) {
+                for (const item of barang) {
+                    const latestPembelianDetail = await db.pembelianDetail
+                        .where('id_barang')
+                        .equals(item.id!)
+                        .sortBy('id_pembelian');
+
+                    const result = await db.barang.put({
+                        id: item.id,
+                        id_satuan: item.id_satuan,
+                        nama_barang: item.nama_barang,
+                        barcode: item.barcode,
+                        harga_jual: item.harga_jual,
+                        brand: item.brand ? item.brand : "",
+                        ukuran: item.ukuran ? item.ukuran : "",
+                        jumlah_stok: item.jumlah_stok ? item.jumlah_stok : 0,
+                        harga_beli_terakhir: latestPembelianDetail.length ? latestPembelianDetail[latestPembelianDetail.length - 1].harga_beli : (item.harga_beli_terakhir ? item.harga_beli_terakhir : 0),
+                        created_at: item.created_at,
+                        image: item.image ? item.image : null,
+                        is_active: item.is_active,
+                    });
+
+                    if (!result) {
+                        return [false, "Data Gagal Diperbarui"];
+                    }
+                }
+
+                return [true, "Data Berhasil Diperbarui"]
+
+            } else {
+                return [false, "Data Gagal Diperbarui"];
+            }
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }

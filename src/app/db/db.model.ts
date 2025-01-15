@@ -24,6 +24,7 @@ export namespace DbModel {
         ukuran?: string;
         harga_jual: string;
         jumlah_stok?: number;
+        harga_beli_terakhir?: number;
         created_at: string;
         image?: any;
         is_active: boolean;

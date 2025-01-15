@@ -106,6 +106,7 @@ export class SetupBarangComponent implements OnInit, OnDestroy {
             { field: 'nama_satuan', headerName: 'SATUAN', flex: 150, sortable: true, resizable: true },
             { field: 'nama_satuan', headerName: 'SATUAN', flex: 150, sortable: true, resizable: true },
             { field: 'harga_jual', headerName: 'HARGA JUAL', flex: 150, sortable: true, resizable: true, cellClass: 'text-end', cellRenderer: (e: any) => { return formatCurrency(e.value, 'EN', 'Rp. ') } },
+            { field: 'harga_beli_terakhir', headerName: 'HARGA BELI TERAKHIR', flex: 170, sortable: true, resizable: true, cellClass: 'text-end', cellRenderer: (e: any) => { return formatCurrency(e.value, 'EN', 'Rp. ') } },
         ],
         dataSource: [],
         height: "calc(100vh - 12rem)",
@@ -238,6 +239,14 @@ export class SetupBarangComponent implements OnInit, OnDestroy {
                 this.FormState = 'list';
 
                 this.getData();
+            })
+    }
+
+    handleSyncPembelian() {
+        this._barangService
+            .syncHargaBeliTerakhir()
+            .then((result) => {
+                console.log(result);
             })
     }
 

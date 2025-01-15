@@ -11,16 +11,22 @@
                 </p>
             </div>
 
-            <div class="flex gap-1">
+            <div class="flex gap-2">
+                <p-button styleClass="p-button-sm p-button-warning mr-3" label="Sync Pembelian" icon="pi pi-sync"
+                    (onClick)="handleSyncPembelian()">
+                </p-button>
+
                 <p-button styleClass="p-button-sm p-button-secondary" label="Tambah" icon="pi pi-plus"
                     (onClick)="onClickButtonAdd()">
                 </p-button>
 
-                <p-menu #menu [model]="items" [popup]="true"></p-menu>
                 <p-button styleClass="p-button-sm p-button-info" label="Export" (onClick)="menu.toggle($event)"
                     icon="pi pi-file">
                 </p-button>
+
+                <p-menu #menu [model]="items" [popup]="true"></p-menu>
             </div>
+
         </div>
 
         <div class="grid">

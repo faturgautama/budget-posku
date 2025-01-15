@@ -112,6 +112,12 @@ export class PembelianService {
                 if (!insertKartuStok[0]) {
                     return [false, "Kartu Stok Gagal Disimpan"];
                 }
+
+                const updateHargaBeliTerakhir = await this._barangService.updateHargaBeliTerakhir(data.detail[i].id_barang, data.detail[i].harga_beli);
+
+                if (!updateHargaBeliTerakhir[0]) {
+                    return [false, "Harga Beli Terakhir Gagal Diperbarui"];
+                }
             }
 
             const updateCounter = await this.updateCounter();
