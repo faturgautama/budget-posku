@@ -115,10 +115,14 @@ export class BerandaComponent implements OnInit {
     }
 
     async importDatabase(args: any) {
+        console.log(args);
+
         try {
             for (let file of args.files) {
                 this.DbFiles.push(file);
             }
+
+            console.log(args);
 
             if (args.files.length) {
                 const files = args.files[0];

@@ -158,7 +158,6 @@ export class SetupBarangComponent implements OnInit, OnDestroy {
             .getAll()
             .then((result) => {
                 if (result[0]) {
-                    console.log(result[1]);
                     this.GridProps.dataSource = result[1];
                     this.Form.reset();
                 }
@@ -246,7 +245,9 @@ export class SetupBarangComponent implements OnInit, OnDestroy {
         this._barangService
             .syncHargaBeliTerakhir()
             .then((result) => {
-                console.log(result);
+                if (result[0]) {
+                    this.getData();
+                }
             })
     }
 

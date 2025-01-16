@@ -44,9 +44,8 @@
                 Import database dari file backup Anda
             </p>
 
-            <p-fileUpload name="demo[]" (onUpload)="importDatabase($event)"
-                url="https://www.primefaces.org/cdn/api/upload.php" [multiple]="true" accept="application/json"
-                [maxFileSize]="1000000" [uploadStyleClass]="'p-button-sm p-button-info'" [uploadLabel]="'Import'"
+            <p-fileUpload name="demo[]" (onSelect)="importDatabase($event)" [multiple]="true" accept="application/json"
+                [uploadStyleClass]="'p-button-sm p-button-info'" [uploadLabel]="'Import'"
                 [cancelStyleClass]="'p-button-sm p-button-info'" [chooseStyleClass]="'p-button-sm p-button-info'">
                 <ng-template pTemplate="content">
                     <ul *ngIf="DbFiles.length">
