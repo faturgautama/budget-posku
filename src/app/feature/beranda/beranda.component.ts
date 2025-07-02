@@ -10,7 +10,6 @@ import { from, map } from 'rxjs';
 import { db } from 'src/app/db/db';
 import { importDB } from 'dexie-export-import';
 import { MessageService } from 'primeng/api';
-import { SupabaseService } from 'src/app/service/supabase.service';
 import { ChartModule } from 'primeng/chart';
 
 @Component({
@@ -52,7 +51,6 @@ export class BerandaComponent implements OnInit {
         private _lokasiService: LokasiService,
         private _messageService: MessageService,
         private _utilityService: UtilityService,
-        private _supabaseService: SupabaseService,
     ) { }
 
     ngOnInit(): void {
