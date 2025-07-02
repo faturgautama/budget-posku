@@ -4,7 +4,6 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
-import { MessageService } from 'primeng/api';
 import { UtilityService } from 'src/app/service/utility.service';
 import { Router } from '@angular/router';
 
@@ -64,7 +63,6 @@ export class AuthenticationComponent implements OnInit {
     constructor(
         private _router: Router,
         private _formBuilder: FormBuilder,
-        private _messageService: MessageService,
         private _utilityService: UtilityService,
     ) {
         this.Form = this._formBuilder.group({
@@ -94,21 +92,6 @@ export class AuthenticationComponent implements OnInit {
 
     onSignIn(): void {
         if (this._utilityService.checkValidator(this.Form)) {
-            // this._supabaseService.checkUser(this.Form.get('email')?.value, this.Form.get('password')?.value)
-            //     .then((result) => {
-            //         this._messageService.clear();
-
-            //         if (result[0]) {
-            //             this._messageService.add({ severity: 'success', summary: 'Success', detail: 'Sign In Berhasil' });
-
-            //             setTimeout(() => {
-            //                 this.handlingAuth(result[1]);
-            //             }, 1500);
-            //         } else {
-            //             this._messageService.add({ severity: 'error', summary: 'Oops', detail: result[1] })
-            //         }
-            //     });
-
             this.handlingAuth(null);
         }
     }
