@@ -137,6 +137,7 @@ export class PosKasirComponent implements OnInit, AfterViewInit {
             ppn_rupiah: [0, [Validators.required]],
             biaya_lain: [0, [Validators.required]],
             total_transaksi: [0, [Validators.required]],
+            kembalian: [0, []],
             keterangan: ["", [Validators.required]],
         });
 

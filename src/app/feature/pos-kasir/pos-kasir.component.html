@@ -70,7 +70,7 @@
                                 </span>
 
                                 <span class="w-14">
-                                    <p-inputNumber [(ngModel)]="item.qty"
+                                    <p-inputNumber [(ngModel)]="item.qty" mode="decimal" [minFractionDigits]="2"
                                         (ngModelChange)="handleChangeQtyOrder($event, i)"
                                         styleClass="w-full p-inputtext-sm text-center qtyOrder">
                                     </p-inputNumber>
@@ -192,8 +192,9 @@
                             </p>
                         </div>
                         <div class="w-8/12" [formGroup]="Form">
-                            <p-inputNumber id="biaya_lain" formControlName="biaya_lain"
-                                styleClass="p-inputtext-sm w-full" (onInput)="handleCountGrandTotalTransaksi($event)">
+                            <p-inputNumber id="biaya_lain" formControlName="biaya_lain" mode="decimal"
+                                [minFractionDigits]="2" styleClass="p-inputtext-sm w-full"
+                                (onInput)="handleCountGrandTotalTransaksi($event)">
                             </p-inputNumber>
                         </div>
                     </div>
@@ -287,7 +288,7 @@
                         </div>
                         <div class="w-8/12" [formGroup]="FormPaymentMethod">
                             <p-inputNumber formControlName="total_payment_method" styleClass="p-inputtext-sm w-full"
-                                [readonly]="true">
+                                [readonly]="true" mode="decimal" [minFractionDigits]="2">
                             </p-inputNumber>
                         </div>
                     </div>
@@ -301,7 +302,7 @@
                         </div>
                         <div class="w-5/12" [formGroup]="FormPaymentMethod" style="margin-left: 5px">
                             <p-inputNumber id="jumlah_bayar" formControlName="jumlah_bayar"
-                                styleClass="p-inputtext-sm w-full"
+                                styleClass="p-inputtext-sm w-full" mode="decimal" [minFractionDigits]="2"
                                 (onInput)="handleInputJumlahPembayaranDiterima($event)"
                                 (keydown.enter)="handleAddNewPaymentMethod(FormPaymentMethod.value)"
                                 [readonly]="FormPaymentMethod.get('total')?.value < 1"

@@ -72,6 +72,7 @@ export namespace DbModel {
         biaya_lain?: number;
         total_transaksi: number;
         keterangan?: string;
+        kembalian?: number;
         status: string
     }
 
