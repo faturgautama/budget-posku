@@ -182,7 +182,6 @@ export class PenjualanComponent implements OnInit, OnDestroy {
                     }
                 })
             ).subscribe((result) => {
-                console.log(result);
                 this.GridProps.dataSource = result;
             })
     }
