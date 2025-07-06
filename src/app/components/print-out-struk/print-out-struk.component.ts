@@ -22,6 +22,8 @@ export class PrintOutStrukComponent implements AfterViewInit, OnDestroy {
 
     Loading = new BehaviorSubject(true);
 
+    Today = new Date();
+
     @HostListener('window:afterprint', ['$event'])
     onAfterPrint(event: Event) {
         window.history.back();

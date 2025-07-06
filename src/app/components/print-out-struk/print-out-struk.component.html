@@ -22,12 +22,21 @@
             </p>
         </div>
 
-        <div class="flex w-full justify-between items-center">
+        <div class="flex w-full justify-between items-center mb-1">
             <p class="text-gray-800 text-xs">
                 No. Faktur
             </p>
             <p class="text-gray-800 text-xs">
                 {{ Penjualan?.no_faktur }}
+            </p>
+        </div>
+
+        <div class="flex w-full justify-between items-center">
+            <p class="text-gray-800 text-xs">
+                Nama Customer
+            </p>
+            <p class="text-gray-800 text-xs">
+                {{ Penjualan?.nama_customer ? Penjualan?.nama_customer : "-" }}
             </p>
         </div>
 
@@ -106,7 +115,7 @@
             </p>
         </div>
 
-        <div *ngFor="let item of Penjualan?.detail_payment[1]" class="flex flex-col w-full mb-3">
+        <div *ngFor="let item of Penjualan?.detail_payment" class="flex flex-col w-full mb-3">
             <div class="flex w-full justify-between mb-1">
                 <p class="text-gray-800 text-xs">
                     {{ item.metode_bayar }}
@@ -130,6 +139,9 @@
     <div class="w-full">
         <p class="text-gray-800 font-semibold text-base text-center">
             ** LUNAS **
+        </p>
+        <p class="text-gray-700 font-medium text-xs text-center">
+            === Tgl. Cetak : {{ Today | date: 'dd-MM-yyyy HH:mm:ss' }} ===
         </p>
     </div>
 </section>
