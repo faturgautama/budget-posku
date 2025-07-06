@@ -141,7 +141,7 @@ export class SetupBarangComponent implements OnInit, OnDestroy {
             id_satuan: [0, [Validators.required]],
             barcode: ["", [Validators.required]],
             brand: ["", []],
-            ukuran: [0, [Validators.required]],
+            ukuran: [0, []],
             harga_jual: [0, [Validators.required]],
             jumlah_stok: [0, []],
             image: ["", []],
