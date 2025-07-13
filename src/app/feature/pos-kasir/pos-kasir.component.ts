@@ -287,6 +287,16 @@ export class PosKasirComponent implements OnInit, AfterViewInit {
         }, 200);
     }
 
+    handleChangeTotalOrder(args: any, index: number): void {
+        this.Order[index].total = args;
+        this.Order[index].qty = this.Order[index].total / this.Order[index].harga_jual;
+
+        setTimeout(() => {
+            this.handleCountTotalOrder();
+            this.onCountPPnPayment('ppn_persen');
+        }, 200);
+    }
+
     handleCountTotalOrder(): void {
         let jumlah_item = 0, grand_total = 0;
 
